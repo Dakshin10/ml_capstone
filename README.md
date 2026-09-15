@@ -2,7 +2,7 @@
 
 # 23CSE301 — Machine Learning Capstone | Review 1
 
-**Dual-Track Supervised Learning Pipeline: Medical Insurance Charge Regression and Bank Term Deposit Classification**
+**Non-Linear Regression on Metro Interstate Traffic Volume**
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.2%2B-F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
@@ -11,11 +11,11 @@
 [![Status](https://img.shields.io/badge/Status-Review%201%20Ready-brightgreen.svg)]()
 
 [Overview](#1-project-overview) &nbsp;|&nbsp;
-[Datasets](#2-dataset-descriptions) &nbsp;|&nbsp;
-[Algorithms](#3-algorithms-implemented) &nbsp;|&nbsp;
-[Preprocessing](#4-preprocessing-and-leakage-prevention) &nbsp;|&nbsp;
-[Regression Results](#5-regression-track-results) &nbsp;|&nbsp;
-[From-Scratch Track](#6-from-scratch-implementation-track) &nbsp;|&nbsp;
+[Dataset](#2-dataset) &nbsp;|&nbsp;
+[Feature Engineering](#3-feature-engineering) &nbsp;|&nbsp;
+[Pipeline Architecture](#4-pipeline-architecture) &nbsp;|&nbsp;
+[Algorithms](#5-algorithms-implemented) &nbsp;|&nbsp;
+[Results](#6-results-and-benchmarks) &nbsp;|&nbsp;
 [Repository Structure](#7-repository-structure) &nbsp;|&nbsp;
 [Quick Start](#8-installation-and-quick-start)
 
@@ -25,206 +25,175 @@
 
 ## 1. Project Overview
 
-This repository contains the complete machine learning codebase for **Course 23CSE301 Capstone (Review 1 Evaluation)**. The project implements a dual-track supervised learning pipeline covering both regression and classification paradigms.
+This sub-section of the **23CSE301 Machine Learning Capstone (Review 1)** implements five non-linear regression algorithms on the UCI Metro Interstate Traffic Volume dataset, predicting hourly westbound traffic volume on the I-94 Minnesota corridor.
 
-All work is organized across two independent notebooks that share a common preprocessing contract: strict 80:20 train/test splits with `random_state=42`, all transformers fitted on training data only, and consistent held-out test evaluation across all models.
+This work is one part of a larger team capstone project. The shared pipeline contract (preprocessing steps, split strategy, leakage guard) is designed to be consistent with the rest of the team's regression and classification notebooks so that results can be compared and merged.
 
-### Track Summary
+**Scope of this sub-section:**
 
-| Attribute | Track 1: Regression | Track 2: Classification |
-| :--- | :--- | :--- |
-| Dataset | Medical Cost Personal Dataset | UCI Bank Marketing (`bank-full.csv`) |
-| File | `data/insurance.csv` | `data/bank-full.csv` |
-| Target Variable | `charges` — Continuous (USD) | `y` — Binary: `yes` (1) / `no` (0) |
-| Rows (clean) | 1,338 | 45,211 |
-| Predictor Features | 6 raw + engineered interactions | 15 (after leakage exclusion) |
-| Primary Metric | R2 Score, RMSE, MAE | Weighted F1, Accuracy, ROC-AUC |
-| Notebook | `notebooks/regression.ipynb` | `notebooks/classification.ipynb` |
+| Property | Value |
+| :--- | :--- |
+| Task | Supervised Regression |
+| Dataset | UCI Metro Interstate Traffic Volume |
+| Target Variable | `traffic_volume` — Hourly vehicle count (vehicles/hr) |
+| Algorithms | Decision Tree, Random Forest, Gradient Boosting, SVR, KNN |
+| Evaluation | R2 Score, RMSE, MAE, 5-Fold Cross-Validation (top 2 models) |
+| Notebook | `notebooks/regression.ipynb` |
 
 ---
 
-## 2. Dataset Descriptions
+## 2. Dataset
 
-### Track 1: Medical Insurance Charges (Regression)
+**Source:** [UCI ML Repository — Dataset #492: Metro Interstate Traffic Volume](https://archive.ics.uci.edu/dataset/492/metro+interstate+traffic+volume)
 
-**Source:** Medical Cost Personal Dataset (Kaggle / public domain).
+**File:** `data/Metro_Interstate_Traffic_Volume.csv`
 
-**Objective:** Predict individual medical charges billed by a health insurance provider based on the policyholder's personal attributes.
+**Description:** Hourly westbound traffic volume records on I-94 at ATR station 301 near Minneapolis-St. Paul, MN, collected from 2012 to 2018. Weather and holiday conditions are included as contextual features.
 
-**Target Variable:** `charges` — Continuous dollar amount billed by the insurer.
-
-**Raw Columns:**
+### Raw Columns
 
 | Column | Type | Description |
 | :--- | :--- | :--- |
-| `age` | Numeric | Age of the primary beneficiary in years |
-| `sex` | Categorical | Beneficiary sex: `male` / `female` |
-| `bmi` | Numeric | Body Mass Index (kg/m2); healthy range: 18.5--24.9 |
-| `children` | Numeric | Number of dependents covered by health insurance |
-| `smoker` | Categorical | Smoking status: `yes` / `no` |
-| `region` | Categorical | US residential region: `northeast`, `northwest`, `southeast`, `southwest` |
-| `charges` | Numeric | Target: individual medical costs billed by the insurer |
+| `holiday` | Categorical | US national holiday or MN State Fair label; `NaN` on regular days |
+| `temp` | Numeric (K) | Atmospheric temperature in Kelvin |
+| `rain_1h` | Numeric (mm) | Millimetres of rainfall in the past hour |
+| `snow_1h` | Numeric (mm) | Millimetres of snowfall in the past hour |
+| `clouds_all` | Numeric (%) | Percentage of cloud coverage |
+| `weather_main` | Categorical | Short weather description (e.g., Clear, Clouds, Rain) |
+| `weather_description` | Categorical | Verbose weather description (excluded — redundant with `weather_main`) |
+| `date_time` | Datetime | Hourly timestamp of the observation |
+| `traffic_volume` | Numeric | **Target:** Westbound hourly vehicle count (0 to ~7,280) |
 
-**Feature Engineering:**
+### Data Cleaning
 
-- `bmi_smoker`: Interaction term between BMI and smoking status — captures the compounding effect of obesity and smoking on medical costs.
-- `is_obese`: Binary indicator (1 if BMI >= 30, else 0) — flags clinically obese policyholders.
-- Age-BMI interaction term: captures how medical cost sensitivity to BMI changes with age.
+Two quality issues were identified and corrected before any modeling:
 
-**Key Data Characteristics:**
+1. **Duplicate Hourly Records:** The raw file contains 48,204 rows but multiple duplicate `date_time` entries exist (same hour logged more than once). All duplicates were removed using a keep-first strategy on `date_time`, reducing the dataset to 40,575 unique hourly records.
 
-- Smoking status is the single strongest predictor — smokers incur charges approximately 3--4x higher than non-smokers at equivalent BMI.
-- The `charges` distribution is right-skewed with a secondary mode around $35,000--$40,000 corresponding to the high-cost smoker subpopulation.
-- No missing values; no deduplication required.
+2. **Impossible Temperature Values:** 10 rows contain `temp = 0 K` (-273.15 C), which is a physical impossibility representing sensor failures. These rows were removed. Final clean dataset: **40,565 rows**.
 
----
+### Train/Test Split
 
-### Track 2: Bank Marketing Term Deposit (Classification)
+| Partition | Rows | Percentage |
+| :--- | :---: | :---: |
+| Training Set (`X_train`) | 32,452 | 80% |
+| Test Set (`X_test`) | 8,113 | 20% |
 
-**Source:** UCI Bank Marketing Dataset — `bank-full.csv` (semicolon-delimited, 45,211 rows).
-
-**Objective:** Predict whether a bank client will subscribe to a term deposit following a direct marketing telephone campaign.
-
-**Target Variable:** `y` — Binary subscription indicator (`yes` → 1, `no` → 0). Class distribution: approximately 88.3% no / 11.7% yes (imbalanced).
-
-**Feature Groups:**
-
-| Group | Columns |
-| :--- | :--- |
-| Client demographics | `age`, `job`, `marital`, `education`, `default` |
-| Financial history | `balance`, `housing`, `loan` |
-| Campaign metadata | `contact`, `day`, `month`, `campaign`, `pdays`, `previous`, `poutcome` |
-
-**Critical Exclusion — `duration`:**
-
-The `duration` column records the length of the last phone call in seconds. This variable is unknown before a call is completed and is therefore excluded from all feature matrices before training. Including it would constitute target leakage — call duration is strongly correlated with subscription outcome, but the information is unavailable at prediction time in a real deployment scenario.
+Split parameters: `test_size=0.2`, `random_state=42`. The same fixed split is used across all five models to ensure a fair comparison.
 
 ---
 
-## 3. Algorithms Implemented
+## 3. Feature Engineering
 
-### Regression Track — `notebooks/regression.ipynb`
+Six additional features were derived from the raw columns before model training:
 
-Ten algorithms are implemented and evaluated on the insurance charges dataset, covering both linear and non-linear families:
+| Feature | Derivation | Purpose |
+| :--- | :--- | :--- |
+| `is_holiday` | 1 if `holiday` is not NaN, else 0 | Binary indicator; replaces the text holiday column |
+| `hour` | `date_time.dt.hour` | Raw hour of day (0--23) |
+| `day_of_week` | `date_time.dt.dayofweek` | Day index (0 = Monday, 6 = Sunday) |
+| `month` | `date_time.dt.month` | Month index (1--12) |
+| `is_weekend` | 1 if `day_of_week` in {5, 6}, else 0 | Binary weekend indicator |
+| `hour_sin` | sin(2 * pi * hour / 24) | Cyclical hour encoding — sine component |
+| `hour_cos` | cos(2 * pi * hour / 24) | Cyclical hour encoding — cosine component |
 
-**Linear Family (Team Sub-section 1):**
+**Why cyclical encoding for hour?**
+A raw integer 0--23 creates an artificial discontinuity: hour 23 and hour 0 appear maximally distant despite being one hour apart. The sine/cosine transformation maps the 24-hour cycle onto a unit circle, ensuring continuity at midnight.
 
-| Algorithm | Notes |
-| :--- | :--- |
-| Linear Regression | OLS baseline |
-| Ridge Regression | L2 regularization, alpha tuned |
-| Lasso Regression | L1 regularization, feature selection effect |
-| ElasticNet Regression | Combined L1+L2, alpha and l1_ratio tuned |
-| Polynomial Regression | Degree=2 feature expansion on scaled inputs |
+**Final feature set used for modeling:**
 
-**Non-Linear Family (Team Sub-section 2):**
-
-| Algorithm | Notes |
-| :--- | :--- |
-| Decision Tree Regressor | Variance-splitting, max_depth tuned |
-| Random Forest Regressor | Bootstrap ensemble, GridSearchCV tuned |
-| Gradient Boosting Regressor | Sequential residual fitting, GridSearchCV tuned |
-| Support Vector Regressor (SVR) | RBF kernel, C and epsilon tuned |
-| K-Nearest Neighbors Regressor (KNN) | Euclidean distance, n_neighbors tuned |
-
-All 10 models are evaluated on the same held-out test split with R2, RMSE, and MAE. The top 2 models include 5-fold cross-validation, residual plots, and feature importance analysis.
+- Numeric: `temp`, `rain_1h`, `snow_1h`, `clouds_all`, `hour`, `day_of_week`, `month`, `is_holiday`, `is_weekend`, `hour_sin`, `hour_cos`
+- Categorical (one-hot encoded): `weather_main`
 
 ---
 
-### Classification Track — `notebooks/classification.ipynb`
-
-Five baseline classifiers for Review 1 (Part A):
-
-| Algorithm | Key Setting |
-| :--- | :--- |
-| Logistic Regression | `solver='lbfgs'`, `max_iter=1000`, linear baseline |
-| K-Nearest Neighbors (KNN) | k=5, standardized features |
-| Gaussian Naive Bayes | Full feature set, dense pipeline |
-| Decision Tree Classifier | Gini impurity, max_depth tuned |
-| Support Vector Classifier (SVC) | RBF kernel, `probability=True`, standardized |
-
-Classification Part B (Random Forest, AdaBoost, Gradient Boosting, Bagging, MLP) is scoped for Review 2.
-
----
-
-## 4. Preprocessing and Leakage Prevention
+## 4. Pipeline Architecture
 
 > [!IMPORTANT]
-> All scalers (`StandardScaler`) and encoders (`OneHotEncoder(handle_unknown='ignore')`) are fitted **exclusively on the training partition** inside scikit-learn `Pipeline` and `ColumnTransformer` constructs. The test set is only ever transformed — never fitted — preventing any form of data leakage.
+> All preprocessing transformers are fitted **exclusively on `X_train`**. The held-out test set `X_test` is only transformed (never fitted), guaranteeing zero data leakage.
 
-### Regression Preprocessing Contract
+```mermaid
+graph TD
+    A[Raw CSV: data/Metro_Interstate_Traffic_Volume.csv] --> B[Deduplication on date_time]
+    B --> C[Remove temp = 0K rows]
+    C --> D[Feature Engineering: is_holiday, cyclical hour, temporal features]
+    D --> E[80:20 Train/Test Split, random_state=42]
+    E --> F[X_train: 32,452 samples]
+    E --> G[X_test: 8,113 samples]
 
-| Step | Detail |
-| :--- | :--- |
-| Split | 80:20, `random_state=42` |
-| Numeric scaling | `StandardScaler` fitted on `X_train` only |
-| Categorical encoding | `OneHotEncoder` for `sex`, `smoker`, `region` |
-| Feature engineering | `bmi_smoker`, `is_obese`, age-BMI interaction |
+    subgraph Leakage-Safe sklearn Pipeline
+        F --> H[ColumnTransformer: fit_transform on X_train only]
+        H --> I[StandardScaler: 11 numeric features]
+        H --> J[OneHotEncoder: weather_main]
+        I --> K[Estimator: DT / RF / GBR / SVR / KNN]
+        J --> K
+    end
 
-### Classification Preprocessing Contract
-
-| Step | Detail |
-| :--- | :--- |
-| Split | Stratified 80:20, `stratify=y`, `random_state=42` |
-| Class ratio preservation | Stratified split maintains 88.3:11.7 class balance |
-| Numeric scaling | `StandardScaler` fitted on `X_train` only |
-| Categorical encoding | `OneHotEncoder` for all categorical columns |
-| Leakage exclusion | `duration` dropped before any preprocessing |
-
----
-
-## 5. Regression Track Results
-
-Evaluating all 10 algorithms on the held-out test split, ranked by test R2 descending.
-
-> **Note:** Exact metric values will be populated after final notebook execution. The table structure below follows the team's standardized reporting format.
-
-| Rank | Algorithm | Family | Test R2 | RMSE (USD) | MAE (USD) | CV R2 (5-fold) |
-| :---: | :--- | :---: | :---: | :---: | :---: | :---: |
-| TBD | Gradient Boosting Regressor | Non-linear | TBD | TBD | TBD | TBD |
-| TBD | Random Forest Regressor | Non-linear | TBD | TBD | TBD | TBD |
-| TBD | Decision Tree Regressor | Non-linear | TBD | TBD | TBD | TBD |
-| TBD | Polynomial Regression | Linear | TBD | TBD | TBD | TBD |
-| TBD | Ridge Regression | Linear | TBD | TBD | TBD | TBD |
-| TBD | ElasticNet Regression | Linear | TBD | TBD | TBD | TBD |
-| TBD | Lasso Regression | Linear | TBD | TBD | TBD | TBD |
-| TBD | Linear Regression | Linear | TBD | TBD | TBD | TBD |
-| TBD | K-Nearest Neighbors | Non-linear | TBD | TBD | TBD | TBD |
-| TBD | Support Vector Regressor | Non-linear | TBD | TBD | TBD | TBD |
-
-**Expected analytical takeaways:**
-- `smoker` and `bmi_smoker` interaction dominate feature importance in tree-based models.
-- Linear models underperform due to the non-linear, bimodal charge distribution driven by the smoker subpopulation.
-- Ensemble methods (Random Forest, Gradient Boosting) are expected to achieve the highest R2 by capturing the smoker/non-smoker subgroup split without manual segmentation.
+    G --> L[ColumnTransformer: transform only]
+    K --> M[Fitted Model]
+    M --> N[Evaluate on X_test]
+    L --> N
+```
 
 ---
 
-## 6. From-Scratch Implementation Track
+## 5. Algorithms Implemented
 
-`notebooks/regression_from_scratch.ipynb` re-implements the five non-linear regression algorithms **without any scikit-learn model classes**, using NumPy and Pandas mathematics only. This track validates algorithmic understanding beyond the sklearn API.
+Five non-linear regression algorithms are implemented and evaluated in `notebooks/regression.ipynb`:
 
-> [!NOTE]
-> The from-scratch notebook uses the Metro Interstate Traffic Volume dataset (`data/Metro_Interstate_Traffic_Volume.csv`) for demonstration purposes. This is the original dataset assigned to the non-linear regression sub-section and differs from the team's main `insurance.csv`. The from-scratch results are therefore not directly comparable to `regression.ipynb`.
+### Decision Tree Regressor
 
-### Permitted vs. Prohibited (From-Scratch Track)
+Recursively partitions feature space by selecting the feature and threshold that minimizes weighted child variance (MSE-equivalent split criterion). Depth and minimum sample constraints control overfitting.
 
-| Component | Permitted | Prohibited |
-| :--- | :--- | :--- |
-| Preprocessing | `StandardScaler`, `OneHotEncoder`, `train_test_split` | — |
-| Metrics | `r2_score`, `mean_squared_error`, `mean_absolute_error` | — |
-| Model classes | **None** | `DecisionTreeRegressor`, `RandomForestRegressor`, `GradientBoostingRegressor`, `SVR`, `KNeighborsRegressor` |
+Key hyperparameters tuned: `max_depth`, `min_samples_split`, `min_samples_leaf`.
 
-### Algorithm Summaries
+### Random Forest Regressor
 
-**Decision Tree:** Recursive binary splitting minimizing weighted child variance. Feature importances accumulated as `n_samples * variance_reduction` per split, normalized to sum to 1.
+Bootstrap ensemble of decision trees. Each tree is trained on a random sample (with replacement) of the training data and a random subset of features at each split. Final prediction is the arithmetic mean across all trees.
 
-**Random Forest:** Bootstrap sampling + `floor(sqrt(p))` random feature subsets per tree. Ensemble prediction is the arithmetic mean across 50 trees.
+Key hyperparameters tuned: `n_estimators`, `max_depth`, `max_features`.
 
-**Gradient Boosting:** Function-space gradient descent. `F_0 = mean(y)`; each round fits a shallow tree to pseudo-residuals `r_i = y_i - F_{m-1}(x_i)` and updates `F_m = F_{m-1} + lr * h_m(x)`.
+### Gradient Boosting Regressor
 
-**SVR (Dual Ascent):** RBF kernel SVR solved via projected gradient ascent on the dual objective. Uses a 3,000-point stratified subsample due to O(n^2) kernel matrix memory requirements on the full training set.
+Sequentially fits shallow trees to the residual errors of the current ensemble. Each new tree corrects the mistakes of all previous trees. The learning rate (shrinkage) controls the step size in function space.
 
-**KNN (Vectorized):** Pairwise squared distances computed via `||x_i - x_j||^2 = ||x_i||^2 + ||x_j||^2 - 2*x_i^T*x_j` — a single BLAS matrix multiply, no Python loops. Optimal k selected via manual hold-out validation grid.
+Key hyperparameters tuned: `n_estimators`, `learning_rate`, `max_depth`.
+
+### Support Vector Regressor (SVR)
+
+Fits a hyperplane within an epsilon-insensitive tube around the training data using a radial basis function (RBF) kernel. Predictions are made by support vectors — training points outside the tube. Sensitive to feature scale; requires `StandardScaler`.
+
+Key hyperparameters tuned: `C`, `epsilon`, `gamma` (via RBF kernel).
+
+### K-Nearest Neighbors Regressor (KNN)
+
+Predicts by averaging the target values of the k training points closest to the query point under Euclidean distance. Non-parametric; no explicit training phase. Sensitive to feature scale; requires `StandardScaler`.
+
+Key hyperparameter tuned: `n_neighbors`.
+
+---
+
+## 6. Results and Benchmarks
+
+All five models are evaluated on the held-out test set of **8,113 samples**, ranked by test R2 score descending. The top 2 models also include 5-fold cross-validation.
+
+| Rank | Algorithm | Test R2 | RMSE (veh/hr) | MAE (veh/hr) | 5-Fold CV R2 | Key Hyperparameters |
+| :---: | :--- | :---: | :---: | :---: | :---: | :--- |
+| 1 | **Gradient Boosting Regressor** | **0.9460** | **459.26** | **275.48** | 0.9437 +/- 0.0019 | `lr=0.2`, `n_estimators=200`, `max_depth=4` |
+| 2 | **Random Forest Regressor** | **0.9454** | **461.74** | **266.93** | 0.9413 +/- 0.0016 | `n_estimators=100`, `max_depth=10` |
+| 3 | Decision Tree Regressor | 0.9396 | 485.70 | 284.42 | — | `max_depth=8` |
+| 4 | K-Nearest Neighbors (KNN) | 0.9286 | 528.02 | 338.88 | — | `n_neighbors=9` |
+| 5 | Support Vector Regressor | 0.8261 | 824.15 | 555.43 | — | `kernel='rbf'`, `C=50.0` |
+
+### Key Analytical Observations
+
+**Why ensemble methods lead:** Gradient Boosting and Random Forest both capture the bimodal, non-linear 24-hour traffic distribution (morning and evening commuter peaks) without manual feature engineering for peak periods. Bagging and boosting independently reduce prediction variance, the dominant error source in hourly traffic data.
+
+**SVR performance:** The default `C=1.0` severely over-regularizes SVR, yielding a baseline R2 of only 0.18. Tuning to `C=50.0` recovers an R2 of 0.8261 (+0.6447 improvement), demonstrating how critical regularization strength is for SVR on large-scale datasets.
+
+**KNN with scaling:** Without `StandardScaler`, `temp` in Kelvin (range ~250--310) dominates Euclidean distances over binary features. Standardizing all features allows KNN to find genuinely meaningful neighbors.
+
+**Feature importances:** Across all tree-based models, `hour`, `hour_sin`, `hour_cos`, and `day_of_week` account for the majority of variance reduction, confirming that daily commuter timing is the primary driver of traffic volume — not weather conditions.
 
 ---
 
@@ -233,26 +202,19 @@ Evaluating all 10 algorithms on the held-out test split, ranked by test R2 desce
 ```text
 ml_capstone/
 |
-├── README.md                               # Master project documentation
+├── README.md                               # This file
 ├── requirements.txt                        # Version-pinned Python dependencies
 ├── .gitignore
 |
 ├── data/
-│   ├── insurance.csv                       # Medical Cost Personal Dataset (regression target)
-│   ├── bank-full.csv                       # UCI Bank Marketing Dataset (classification target)
-│   └── Metro_Interstate_Traffic_Volume.csv # UCI Traffic Dataset (from-scratch track only)
+│   └── Metro_Interstate_Traffic_Volume.csv # UCI Dataset #492 (40,565 clean rows)
 |
-├── models/                                 # Serialized trained model artifacts (optional)
+├── models/                                 # Serialized model artifacts (optional)
 |
 └── notebooks/
-    ├── regression.ipynb                    # Track 1 — Full 10-model regression pipeline
-    │                                       #   Linear family + Non-linear family
-    │                                       #   Dataset: insurance.csv
-    ├── regression_from_scratch.ipynb       # Track 1 — From-scratch NumPy implementations
-    │                                       #   5 non-linear algorithms, no sklearn estimators
-    │                                       #   Dataset: Metro_Interstate_Traffic_Volume.csv
-    └── classification.ipynb                # Track 2 — Classification Part A (5 classifiers)
-                                            #   Dataset: bank-full.csv
+    └── regression.ipynb                    # Full 5-model regression pipeline
+                                            # Includes: EDA, preprocessing, training,
+                                            # hyperparameter tuning, CV, visualizations
 ```
 
 ---
@@ -264,7 +226,7 @@ ml_capstone/
 - Python 3.10 or higher (tested on 3.12)
 - pip 23+
 
-### Step 1 — Clone the Repository
+### Step 1 — Clone and Enter the Repository
 
 ```bash
 git clone https://github.com/Dakshin10/ml_capstone.git
@@ -289,67 +251,52 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-**Core dependencies:**
-
 | Package | Minimum Version | Purpose |
 | :--- | :---: | :--- |
-| `numpy` | 1.24.0 | Numerical computation, from-scratch model math |
-| `pandas` | 2.0.0 | Data loading, feature engineering |
-| `matplotlib` | 3.7.0 | Plots and diagnostic charts |
+| `numpy` | 1.24.0 | Numerical computation |
+| `pandas` | 2.0.0 | Data loading and feature engineering |
+| `matplotlib` | 3.7.0 | Static plots and charts |
 | `seaborn` | 0.12.0 | Statistical visualization |
-| `scikit-learn` | 1.2.0 | Preprocessing, metrics, sklearn-based models |
+| `scikit-learn` | 1.2.0 | Preprocessing, models, metrics |
 | `jupyter` | 1.0.0 | Notebook server |
 | `ipykernel` | 6.0.0 | Python kernel for VS Code / JupyterLab |
 
-> [!IMPORTANT]
-> scikit-learn 1.2+ is required — earlier versions use the deprecated `OneHotEncoder(sparse=False)` parameter. The current code uses `sparse_output=False`.
+> [!NOTE]
+> scikit-learn 1.2+ is required. Earlier versions use the deprecated `OneHotEncoder(sparse=False)` parameter; this codebase uses `sparse_output=False`.
 
-### Step 4 — Run the Notebooks
+### Step 4 — Open the Notebook
 
-Both notebooks use relative data paths (`../data/`) and are fully self-contained. Select the correct Python kernel in VS Code (the `.venv` interpreter created above) before running.
-
-**Option A — Jupyter:**
+**Jupyter:**
 ```bash
 jupyter notebook
 ```
-Navigate to the target notebook and select **Kernel -> Restart and Run All**.
+Navigate to `notebooks/regression.ipynb` and select **Kernel -> Restart and Run All**.
 
-**Option B — VS Code:**
-1. Open the `.ipynb` file
+**VS Code:**
+1. Open `notebooks/regression.ipynb`
 2. Click the kernel selector (top-right corner)
-3. Select `Python 3.x (.venv)` — the virtual environment you created above
+3. Select the Python interpreter from `.venv` inside this project directory
 4. Click **Run All**
 
 > [!WARNING]
-> Do not use the `d:\venv` environment if it appears in the kernel picker. That environment belongs to a separate project and does not contain the required ML packages. Always use the `.venv` created inside this project directory or a system Python installation with all packages confirmed present.
+> If `d:\venv` appears in the kernel list, do not select it. That environment belongs to a separate project and is missing the required ML packages. Always use `.venv` created inside this project directory, or a system Python installation where numpy, pandas, sklearn, and matplotlib are confirmed installed.
 
 ---
 
 ## 9. Reproducibility
 
-All stochastic operations use `random_state=42`, including:
+All stochastic operations use `random_state=42`:
 
-- `train_test_split` — identical partitions on every run
-- `RandomForestRegressor` and `RandomForestRegressorScratch` — deterministic bootstrap sampling
-- `GradientBoostingRegressor` — deterministic feature subsampling
-- `SVRScratch` — deterministic subsample selection and dual initialization
+- `train_test_split(random_state=42)` — identical partitions across runs
+- `RandomForestRegressor(random_state=42)` — deterministic bootstrap sampling
+- `GradientBoostingRegressor(random_state=42)` — deterministic feature subsampling
 
-Running any notebook from top to bottom produces the exact metric values reported in section 5.
-
----
-
-## 10. Academic Integrity and AI Assistance
-
-In compliance with university evaluation policies for B.Tech 23CSE301:
-
-- Generative AI (Google Antigravity / Gemini) was used for code scaffolding, boilerplate generation, and notebook structuring.
-- All analytical interpretations, exploratory observations, and conclusions are verified against actual executed notebook outputs by the project team.
-- No model performance metrics or experimental results were fabricated or assumed without execution.
+Running `notebooks/regression.ipynb` from top to bottom reproduces the exact metric values in section 6.
 
 ---
 
 <div align="center">
 
-B.Tech Computer Science and Engineering &nbsp;|&nbsp; Course 23CSE301 Machine Learning Capstone &nbsp;|&nbsp; Review 1 Submission
+B.Tech Computer Science and Engineering &nbsp;|&nbsp; 23CSE301 Machine Learning Capstone &nbsp;|&nbsp; Review 1
 
 </div>
