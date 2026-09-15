@@ -8,19 +8,19 @@ Comprehensive machine learning capstone project implementing both **Regression**
 
 | Track | Target Variable | Type | Dataset | Rows | Features | Primary Metric |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Regression** | `charges` | Continuous (USD) | `data/insurance.csv` | 1,338 | 6 | $R^2$, RMSE, MAE |
+| **Regression** | `traffic_volume` | Continuous (vehicles/hr) | `dataset/Metro_Interstate_Traffic_Volume.csv` | 48,204 | 9 | $R^2$, RMSE, MAE |
 | **Classification (Part A)** | `y` (`yes` / `no`) | Binary (0 / 1) | `data/bank-full.csv` | 45,211 | 15 (after exclusions) | Weighted F1, Accuracy, Confusion Matrix |
 
 ---
 
 ## 2. Dataset Descriptions
 
-### Track 1: Medical Insurance Charges (Regression)
-- **Source:** Medical Cost Personal Dataset
-- **Objective:** Predict individual medical charges billed by health insurance based on personal attributes.
-- **Features:** `age`, `sex`, `bmi`, `children`, `smoker`, `region`
-- **Target:** `charges` (continuous)
-- **Feature Engineering:** `bmi_smoker` interaction term, obesity indicator (`is_obese`), age-BMI interaction.
+### Track 1: Metro Interstate Traffic Volume (Regression)
+- **Source:** UCI Machine Learning Repository / Kaggle (`Metro_Interstate_Traffic_Volume.csv`)
+- **Objective:** Predict hourly Interstate 94 Westbound traffic volume based on weather features, temperature, date/time attributes, and national holidays.
+- **Raw Features:** `holiday`, `temp`, `rain_1h`, `snow_1h`, `clouds_all`, `weather_main`, `weather_description`, `date_time`
+- **Target:** `traffic_volume` (continuous numerical target, range 0–7,280 vehicles/hour)
+- **Feature Engineering:** Temporal extraction (`hour`, `day_of_week`, `month`), weekend indicator (`is_weekend`), holiday flag (`is_holiday`), and temperature conversion (`temp_celsius = temp - 273.15`).
 
 ### Track 2: Bank Marketing Term Deposit Prediction (Classification — Part A)
 - **Source:** UCI Bank Marketing Dataset (`bank-full.csv`, delimited by `;`)
@@ -33,18 +33,13 @@ Comprehensive machine learning capstone project implementing both **Regression**
 
 ## 3. Algorithms Implemented (Review 1)
 
-### Regression Track (`notebooks/regression.ipynb`)
-1. Linear Regression
-2. Ridge Regression
-3. Lasso Regression
-4. ElasticNet Regression
-5. Polynomial Regression (degree = 2)
-6. Decision Tree Regressor
-7. Random Forest Regressor (with GridSearchCV tuning)
-8. Gradient Boosting Regressor (with GridSearchCV tuning)
-9. Support Vector Regressor (SVR with RBF kernel)
-10. K-Nearest Neighbors Regressor (KNN)
-*Includes 5-fold Cross-Validation on top estimators, residual plots, and feature importance analyses.*
+### Regression Track (`notebooks/regression.ipynb`) — First 5 Regression Algorithms
+1. **Linear Regression** (Ordinary Least Squares baseline)
+2. **Ridge Regression** (L2 regularized linear model, with GridSearchCV tuning)
+3. **Lasso Regression** (L1 regularized linear model, with GridSearchCV tuning)
+4. **ElasticNet Regression** (Combined L1/L2 regularized linear model)
+5. **Polynomial Regression (degree = 2)** (Degree-2 interaction feature expansion + Linear Regression)
+*Includes 5-fold Cross-Validation on top estimators, residual plots, and predicted vs actual performance charts.*
 
 ### Classification Track — Part A (`notebooks/classification.ipynb`)
 1. **Logistic Regression** (Baseline linear classifier, lbfgs solver, max_iter=1000)
@@ -73,13 +68,14 @@ ml_capstone/
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
+├── dataset/
+│   └── Metro_Interstate_Traffic_Volume.csv # Metro Interstate Traffic Volume dataset
 ├── data/
-│   ├── bank-full.csv           # Bank marketing dataset (semicolon-delimited)
-│   └── insurance.csv           # Medical cost personal dataset
-├── models/                     # Serialized model artifacts (optional)
+│   └── bank-full.csv                       # Bank marketing dataset
+├── models/                                 # Serialized model artifacts (optional)
 └── notebooks/
-    ├── classification.ipynb    # Classification Track (Part A — Review 1)
-    └── regression.ipynb        # Regression Track (10 Models — Review 1)
+    ├── classification.ipynb                # Classification Track (Part A — Review 1)
+    └── regression.ipynb                    # Regression Track (5 Algorithms — Review 1)
 ```
 
 ---
@@ -105,7 +101,7 @@ Navigate to:
 - `notebooks/regression.ipynb` $\rightarrow$ Click `Kernel` $\rightarrow$ `Restart & Run All`
 - `notebooks/classification.ipynb` $\rightarrow$ Click `Kernel` $\rightarrow$ `Restart & Run All`
 
-Both notebooks use relative paths (`../data/`) and run self-contained from top to bottom.
+Both notebooks use relative paths (`../dataset/` and `../data/`) and run self-contained from top to bottom.
 
 ---
 
