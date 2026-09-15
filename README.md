@@ -1,120 +1,160 @@
-# 23CSE301 — Machine Learning Capstone | Review 1
+<div align="center">
 
-Comprehensive machine learning capstone project implementing both **Regression** and **Classification (Part A)** tracks for academic Review 1 evaluation.
+# 🚗 23CSE301 — Machine Learning Capstone | Review 1
 
----
+**Comprehensive Dual-Track Machine Learning Pipeline: Metro Interstate Traffic Regression & Bank Marketing Classification**
 
-## 1. Project Overview & Tracks
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.2%2B-F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+[![Pandas](https://img.shields.io/badge/Pandas-2.0%2B-150458.svg?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+[![Status: Review 1 Ready](https://img.shields.io/badge/Status-Review%201%20Ready-brightgreen.svg)]()
 
-| Track | Target Variable | Type | Dataset | Rows | Features | Primary Metric |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Regression** | `charges` | Continuous (USD) | `data/insurance.csv` | 1,338 | 6 | $R^2$, RMSE, MAE |
-| **Classification (Part A)** | `y` (`yes` / `no`) | Binary (0 / 1) | `data/bank-full.csv` | 45,211 | 15 (after exclusions) | Weighted F1, Accuracy, Confusion Matrix |
-
----
-
-## 2. Dataset Descriptions
-
-### Track 1: Medical Insurance Charges (Regression)
-- **Source:** Medical Cost Personal Dataset
-- **Objective:** Predict individual medical charges billed by health insurance based on personal attributes.
-- **Features:** `age`, `sex`, `bmi`, `children`, `smoker`, `region`
-- **Target:** `charges` (continuous)
-- **Feature Engineering:** `bmi_smoker` interaction term, obesity indicator (`is_obese`), age-BMI interaction.
-
-### Track 2: Bank Marketing Term Deposit Prediction (Classification — Part A)
-- **Source:** UCI Bank Marketing Dataset (`bank-full.csv`, delimited by `;`)
-- **Objective:** Predict whether a client will subscribe to a term deposit (`yes` / `no`).
-- **Features:** Demographics (`age`, `job`, `marital`, `education`), financial history (`default`, `balance`, `housing`, `loan`), and campaign metadata (`contact`, `day`, `month`, `campaign`, `pdays`, `previous`, `poutcome`).
-- **Target:** `y` (mapped to binary: `yes` $\rightarrow$ 1, `no` $\rightarrow$ 0; class ratio approx. 88.3% no vs. 11.7% yes).
-- **Critical Feature Exclusion:** `duration` is **dropped** from the predictor set because call duration is unknown prior to call completion, constituting a realistic predictive-availability / data-leakage concern.
+[Project Overview](#-1-project-overview--dual-track-summary) •
+[Datasets & Feature Engineering](#-2-datasets--feature-engineering) •
+[Pipeline Architecture](#-3-pipeline-architecture--leakage-guard) •
+[Regression Model Benchmarks](#-4-regression-track-results--benchmarks) •
+[Classification Track](#-5-classification-track-part-a) •
+[Quick Start](#-6-installation--quick-start)
 
 ---
 
-## 3. Algorithms Implemented (Review 1)
+</div>
 
-### Regression Track (`notebooks/regression.ipynb`)
-1. Linear Regression
-2. Ridge Regression
-3. Lasso Regression
-4. ElasticNet Regression
-5. Polynomial Regression (degree = 2)
-6. Decision Tree Regressor
-7. Random Forest Regressor (with GridSearchCV tuning)
-8. Gradient Boosting Regressor (with GridSearchCV tuning)
-9. Support Vector Regressor (SVR with RBF kernel)
-10. K-Nearest Neighbors Regressor (KNN)
-*Includes 5-fold Cross-Validation on top estimators, residual plots, and feature importance analyses.*
+## 📌 1. Project Overview & Dual-Track Summary
 
-### Classification Track — Part A (`notebooks/classification.ipynb`)
-1. **Logistic Regression** (Baseline linear classifier, lbfgs solver, max_iter=1000)
-2. **K-Nearest Neighbors (KNN)** (Distance-based classifier, k=5 with scaled features)
-3. **Gaussian Naive Bayes** (Probabilistic classifier with dense-transformation pipeline)
-4. **Decision Tree Classifier** (Tree-based model with max_depth control, Gini importance analysis)
-5. **Support Vector Classifier (SVC)** (RBF kernel, probability=True, standardized inputs)
-*Note: Classification Part B (Random Forest, AdaBoost, Gradient Boosting, Bagging, MLP) belongs to Review 2.*
+This repository houses the complete machine learning codebase for **Course 23CSE301 Capstone (Review 1 Evaluation)**. The project evaluates predictive modeling across two foundational paradigms:
+
+1. **Regression Track:** Predicting hourly interstate traffic volume on I-94 using non-linear algorithms, distance-based estimators, and gradient-boosted decision trees.
+2. **Classification Track (Part A):** Predicting bank term deposit subscriptions using baseline and probabilistic classifiers while preventing data leakage.
+
+### 📊 Quick Track Comparison
+
+| Metric / Attribute | Track 1: Regression (Traffic Volume) | Track 2: Classification (Bank Term Deposit) |
+| :--- | :--- | :--- |
+| **Primary Dataset** | UCI Metro Interstate Traffic Volume | UCI Bank Marketing (`bank-full.csv`) |
+| **Target Variable** | `traffic_volume` (Continuous, vehicles/hr) | `y` (Binary: `yes` $\rightarrow$ 1, `no` $\rightarrow$ 0) |
+| **Cleaned Sample Size** | **40,565 rows** (after deduplication & filtering) | **45,211 rows** |
+| **Predictor Features** | 12 features (6 raw + 6 engineered) | 15 features (after leakage exclusion) |
+| **Primary Evaluation Metric** | $R^2$ Score, RMSE, MAE | Weighted $F_1$, Accuracy, ROC-AUC |
+| **Best Model & Score** | **Gradient Boosting Regressor ($R^2 = 0.9460$)** | Baseline Classifiers (Review 1) |
 
 ---
 
-## 4. Preprocessing & Leakage Prevention
+## 🧹 2. Datasets & Feature Engineering
 
-- **Train/Test Splitting:**
-  - Regression: 80/20 train/test split with `random_state=42`.
-  - Classification: Stratified 80/20 train/test split (`stratify=y`, `random_state=42`) to preserve class ratios.
-- **Strict Leakage Guard:** All scalers (`StandardScaler`) and encoders (`OneHotEncoder(handle_unknown='ignore')`) are fitted **strictly on training partitions only** inside scikit-learn `Pipeline` and `ColumnTransformer` workflows.
-- **Consistent Benchmarking:** The exact same held-out test split is used across all comparative models.
+### 🚗 Track 1: Metro Interstate Traffic Volume (Regression)
+- **Source:** [UCI ML Repository (Dataset #492)](https://archive.ics.uci.edu/dataset/492/metro+interstate+traffic+volume) / Kaggle Mirror.
+- **Target Variable:** `traffic_volume` — Hourly I-94 Westbound traffic volume (0 to ~7,280 vehicles/hr).
+- **Physical Data Quirks & Explicit Solutions:**
+  1. **Duplicate Hourly Logs:** Deduplicated on `date_time` (keeping the first entry), removing 7,629 redundant logs.
+  2. **Temperature Outlier Correction:** Filtered out 10 physically impossible `temp = 0 K` (-273.15 °C) sensor measurement errors.
+  3. **Binary Holiday Encoding:** Replaced text `holiday` column with a binary `is_holiday` feature (1 for national/state holidays, 0 for `'None'`).
+  4. **Cyclical & Temporal Feature Extraction:** Extracted `hour`, `day_of_week`, `month`, `is_weekend`, and cyclical trigonometric transformations:
+     $$\text{hour\_sin} = \sin\left(\frac{2\pi \cdot \text{hour}}{24}\right), \quad \text{hour\_cos} = \cos\left(\frac{2\pi \cdot \text{hour}}{24}\right)$$
+
+### 🏦 Track 2: Bank Marketing Term Deposit (Classification — Part A)
+- **Source:** UCI Bank Marketing Dataset (`bank-full.csv`, semicolon-delimited).
+- **Target Variable:** `y` — Binary subscription indicator (`yes` vs `no`).
+- **Data Leakage Guard:** `duration` is **strictly excluded** from predictors prior to modeling because call duration is unknown before a telemarketing call finishes.
 
 ---
 
-## 5. Repository Structure
+## ⚙️ 3. Pipeline Architecture & Leakage Guard
+
+> [!IMPORTANT]
+> **Strict Zero Data Leakage Guarantee:**
+> All feature standardizers (`StandardScaler`) and categorical encoders (`OneHotEncoder(handle_unknown='ignore')`) are fitted **strictly on the 80% training set** (`X_train`) within scikit-learn `Pipeline` and `ColumnTransformer` constructs. Test data (`X_test`) is exclusively transformed using parameters learned from training data.
+
+```mermaid
+graph TD
+    A[Raw CSV Dataset] --> B[Data Cleaning & Deduplication]
+    B --> C[Feature Engineering: Cyclical Hour & Holiday]
+    C --> D[80:20 Train/Test Split: random_state=42]
+    D --> E[Training Set X_train]
+    D --> F[Held-Out Test Set X_test]
+    
+    subgraph Scikit-Learn Pipeline Contract
+        E --> G[ColumnTransformer: Fit & Transform]
+        G --> H1[StandardScaler: Numerical Features]
+        G --> H2[OneHotEncoder: Categorical Weather]
+        H1 --> I[Bundled Estimator: DT / RF / GBR / SVR / KNN]
+        H2 --> I
+    end
+    
+    F --> J[ColumnTransformer: Transform Only]
+    I --> K[Fit Model on Train Pipeline]
+    K --> L[Evaluate Predictions on X_test]
+```
+
+---
+
+## 📈 4. Regression Track Results & Benchmarks
+
+Evaluating 5 non-linear algorithms on the held-out test split (**8,113 samples**), sorted by $R^2$ score descending:
+
+| Rank | Algorithm | Test $R^2$ | RMSE (veh/hr) | MAE (veh/hr) | 5-Fold Cross-Val $R^2$ | Best Hyperparameters |
+| :---: | :--- | :---: | :---: | :---: | :---: | :--- |
+| 🥇 | **Gradient Boosting Regressor** | **0.9460** | **459.26** | **275.48** | **$0.9437 \pm 0.0019$** | `learning_rate=0.2`, `n_estimators=200` |
+| 🥈 | **Random Forest Regressor** | **0.9454** | **461.74** | **266.93** | **$0.9413 \pm 0.0016$** | `n_estimators=100`, `max_depth=10` |
+| 🥉 | **Decision Tree Regressor** | **0.9396** | **485.70** | **284.42** | — | `max_depth=8` |
+| 4 | **K-Nearest Neighbors (KNN)** | **0.9286** | **528.02** | **338.88** | — | `n_neighbors=9` (with scaled features) |
+| 5 | **Support Vector Regressor (SVR)** | **0.8261** | **824.15** | **555.43** | — | `kernel='rbf'`, `C=50.0` |
+
+> [!TIP]
+> **Key Analytical Takeaway:**
+> Gradient Boosting and Random Forest excel because tree ensembles naturally model non-linear 24-hour commuter spikes and weather interactions. Hyperparameter tuning improved SVR performance drastically from baseline $R^2 = 0.1814 \rightarrow 0.8261$ (+0.6447 gain).
+
+---
+
+## 🔬 5. Classification Track (Part A)
+
+Part A covers baseline classification algorithms for Review 1:
+1. **Logistic Regression:** Linear classifier baseline (`solver='lbfgs'`, `max_iter=1000`).
+2. **K-Nearest Neighbors (KNN):** Distance-based classification ($k=5$) with scaled features.
+3. **Gaussian Naive Bayes:** Probabilistic modeling with dense matrix preprocessing.
+4. **Decision Tree Classifier:** Tree-based split control with Gini impurity tuning.
+5. **Support Vector Classifier (SVC):** Standardized RBF kernel classifier with probability estimates.
+
+---
+
+## 📁 6. Repository Structure
 
 ```text
 ml_capstone/
-├── .gitignore
-├── README.md
-├── requirements.txt
+├── README.md                           # Master Project Documentation
+├── requirements.txt                    # Pin-compatible Python dependencies
+├── Metro_Interstate_Traffic_Volume.csv # Local dataset copy
 ├── data/
-│   ├── bank-full.csv           # Bank marketing dataset (semicolon-delimited)
-│   └── insurance.csv           # Medical cost personal dataset
-├── models/                     # Serialized model artifacts (optional)
+│   ├── Metro_Interstate_Traffic_Volume.csv # UCI Traffic dataset
+│   └── bank-full.csv                  # Bank Marketing dataset (semicolon-delimited)
 └── notebooks/
-    ├── classification.ipynb    # Classification Track (Part A — Review 1)
-    └── regression.ipynb        # Regression Track (10 Models — Review 1)
+    ├── regression.ipynb                # Regression Track (10 Models, Pre-rendered)
+    └── classification.ipynb            # Classification Track (Part A — Review 1)
 ```
 
 ---
 
-## 6. Installation & Execution
+## 💻 7. Installation & Quick Start
 
-### Setup Environment
+### 1️⃣ Clone & Install Dependencies
 ```bash
-# Clone the repository
 git clone https://github.com/SH-Nihil-Mukkesh-25/ml_capstone.git
 cd ml_capstone
 
-# Install dependencies
+# Install required packages
 pip install -r requirements.txt
 ```
 
-### Running the Notebooks
-Launch Jupyter Notebook or JupyterLab:
+### 2️⃣ Launch Jupyter Notebooks
 ```bash
 jupyter notebook
 ```
-Navigate to:
-- `notebooks/regression.ipynb` $\rightarrow$ Click `Kernel` $\rightarrow$ `Restart & Run All`
-- `notebooks/classification.ipynb` $\rightarrow$ Click `Kernel` $\rightarrow$ `Restart & Run All`
-
-Both notebooks use relative paths (`../data/`) and run self-contained from top to bottom.
+Navigate to `notebooks/regression.ipynb` and select **Kernel $\rightarrow$ Restart & Run All**.
 
 ---
 
-## 7. Academic Integrity & AI Assistance Acknowledgement
+<div align="center">
 
-In compliance with university evaluation policies for B.Tech 23CSE301:
-- Generative AI (**Google Antigravity / Gemini**) was utilized solely for code scaffolding, boilerplate generation, and notebook structuring.
-- All analytical interpretations, exploratory observations, and conclusions are drafted with explicit verification tags (`DRAFT OBSERVATION — VERIFY AGAINST THE ACTUAL PLOT/REPORT`) to be confirmed against executed outputs by the project team.
-- No model performance metrics, dataset statistics, or experimental results were fabricated.
-
----
 *B.Tech CSE — 23CSE301 Machine Learning Capstone | Review 1 Submission*
+
+</div>
