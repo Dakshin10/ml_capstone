@@ -11,8 +11,14 @@ seaborn>=0.12.0
 
 # Machine learning
 scikit-learn>=1.2.0          # 1.2+ required for OneHotEncoder(sparse_output=False)
+scipy>=1.10.0
+joblib>=1.2.0
+
+# Dataset ingestion
+kagglehub[pandas-datasets]>=0.2.0
 
 # Notebook
 jupyter>=1.0.0
 ipykernel>=6.0.0
 notebook>=7.0.0
+
