@@ -24,3 +24,9 @@ ipykernel>=6.0.0
 notebook>=7.0.0
 nbclient>=0.7.0
 
+# Interactive GUI & Deployment (Bonus)
+streamlit>=1.30.0
+plotly>=5.15.0
+
+
+

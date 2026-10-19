@@ -90,6 +90,9 @@ ml_capstone/
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
+├── app/
+│   ├── app.py                             # Interactive Streamlit Capstone Dashboard (GUI)
+│   └── README.md                          # Dashboard Deployment & Cloud Hosting Guide
 ├── data/
 │   ├── bank-full.csv                      # Classification: Bank Marketing dataset
 │   ├── Metro_Interstate_Traffic_Volume.csv # Regression: Interstate traffic volume dataset
@@ -99,6 +102,8 @@ ml_capstone/
 │   └── *.png                              # Exported high-resolution publication charts
 ├── models/
 │   ├── .gitkeep
+│   ├── regression_gbr_pipeline.pkl        # Serialized fitted Gradient Boosting Regressor
+│   ├── classification_gbc_pipeline.pkl    # Serialized fitted Gradient Boosting Classifier
 │   ├── kmeans_customer_segmentation.pkl   # Serialized fitted K-Means clustering model
 │   └── scaler_customer_segmentation.pkl   # Serialized fitted RFM StandardScaler
 └── notebooks/
@@ -141,6 +146,15 @@ Run all cells in sequence:
 - `notebooks/clustering.ipynb`
 
 All notebooks include dynamic path resolution and will execute without errors whether launched from the workspace root or directly inside `notebooks/`.
+
+### Running the Interactive Streamlit Dashboard (Bonus: +2 Marks)
+Launch the interactive web application locally:
+```bash
+streamlit run app/app.py
+```
+Open `http://localhost:8501` to access real-time inference simulators, model diagnostic plots, 3D PCA cluster projections, and viva voce cheat sheets.
+
+For public cloud hosting (Streamlit Community Cloud or Render), refer to [`app/README.md`](file:///d:/Dakshin_colledge_sem5/ML/Capstone_Project/ml_capstone/app/README.md).
 
 ---
 
