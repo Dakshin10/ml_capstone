@@ -26,75 +26,146 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', sans-serif;
     }
     
+    /* Optimized page container spacing */
+    .block-container {
+        padding-top: 1.8rem !important;
+        padding-bottom: 3.5rem !important;
+        padding-left: 2.2rem !important;
+        padding-right: 2.2rem !important;
+        max-width: 1400px !important;
+    }
+    
+    /* Dynamic adaptive gradient title */
     .main-title {
-        font-size: 2.3rem;
+        font-size: 2.35rem;
         font-weight: 800;
-        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+        letter-spacing: -0.025em;
+        background: linear-gradient(135deg, #3b82f6 0%, #0ea5e9 45%, #8b5cf6 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        margin-bottom: 0.2rem;
+        margin-bottom: 0.35rem;
     }
     
     .subtitle {
         font-size: 1.05rem;
-        color: #4b5563;
-        margin-bottom: 1.5rem;
+        color: var(--text-color);
+        opacity: 0.75;
+        margin-bottom: 1.6rem;
+        line-height: 1.5;
     }
     
+    /* Theme-adaptive glassmorphic metric card */
     .metric-card {
-        background: linear-gradient(145deg, #ffffff, #f8fafc);
-        border: 1px solid #e2e8f0;
+        background: var(--secondary-background-color);
+        border: 1px solid rgba(128, 128, 128, 0.22);
         border-radius: 14px;
-        padding: 1.2rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        padding: 1.35rem 1.45rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        margin-bottom: 0.8rem;
     }
     .metric-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        border-color: rgba(59, 130, 246, 0.45);
     }
     
     .metric-title {
-        font-size: 0.85rem;
+        font-size: 0.78rem;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.06em;
         font-weight: 700;
-        color: #64748b;
+        color: var(--text-color);
+        opacity: 0.68;
+        margin-bottom: 0.45rem;
     }
     
     .metric-value {
-        font-size: 1.85rem;
+        font-size: 1.95rem;
         font-weight: 800;
-        color: #0f172a;
-        margin: 0.3rem 0;
+        color: var(--text-color);
+        margin: 0.2rem 0 0.35rem 0;
+        line-height: 1.2;
     }
     
     .metric-desc {
-        font-size: 0.82rem;
-        color: #059669;
+        font-size: 0.84rem;
+        color: #10b981;
         font-weight: 600;
     }
     
+    /* Vibrant translucent badges with dual mode high contrast */
     .badge {
-        display: inline-block;
-        padding: 0.25rem 0.65rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.28rem 0.75rem;
         border-radius: 9999px;
-        font-size: 0.75rem;
+        font-size: 0.74rem;
         font-weight: 700;
         text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
-    .badge-blue { background-color: #dbeafe; color: #1e40af; }
-    .badge-green { background-color: #d1fae5; color: #065f46; }
-    .badge-purple { background-color: #f3e8ff; color: #6b21a8; }
-    .badge-amber { background-color: #fef3c7; color: #92400e; }
+    .badge-blue { 
+        background-color: rgba(59, 130, 246, 0.16); 
+        color: #3b82f6; 
+        border: 1px solid rgba(59, 130, 246, 0.38); 
+    }
+    .badge-green { 
+        background-color: rgba(16, 185, 129, 0.16); 
+        color: #10b981; 
+        border: 1px solid rgba(16, 185, 129, 0.38); 
+    }
+    .badge-purple { 
+        background-color: rgba(168, 85, 247, 0.16); 
+        color: #a855f7; 
+        border: 1px solid rgba(168, 85, 247, 0.38); 
+    }
+    .badge-amber { 
+        background-color: rgba(245, 158, 11, 0.16); 
+        color: #f59e0b; 
+        border: 1px solid rgba(245, 158, 11, 0.38); 
+    }
     
+    /* Subcard and strategy container */
+    .subcard-box {
+        background: rgba(128, 128, 128, 0.08);
+        border: 1px solid rgba(128, 128, 128, 0.18);
+        border-radius: 9px;
+        padding: 1rem 1.15rem;
+        margin-top: 0.75rem;
+        color: var(--text-color);
+    }
+    
+    /* Tabs styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+        padding-bottom: 4px;
+        margin-bottom: 1.6rem;
     }
     .stTabs [data-baseweb="tab"] {
         border-radius: 8px;
-        padding: 8px 18px;
+        padding: 9px 18px;
         font-weight: 600;
+        color: var(--text-color);
+        opacity: 0.75;
+        transition: all 0.2s ease;
+    }
+    .stTabs [data-baseweb="tab"]:hover {
+        opacity: 1;
+        background-color: rgba(128, 128, 128, 0.1);
+    }
+    .stTabs [aria-selected="true"] {
+        opacity: 1 !important;
+        background-color: rgba(59, 130, 246, 0.12) !important;
+        color: #3b82f6 !important;
+    }
+    
+    /* Plotly chart spacing */
+    [data-testid="stPlotlyChart"] {
+        margin-top: 0.4rem;
+        margin-bottom: 0.4rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -229,7 +300,7 @@ if selected_page == "🌟 Executive Overview":
     st.markdown("<div class='subtitle'>Comprehensive End-to-End Pipeline Across Regression, Classification, and Clustering Tracks</div>", unsafe_allow_html=True)
     
     # KPI Metrics Header
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3, col4 = st.columns(4, gap="medium")
     with col1:
         st.markdown("""
         <div class='metric-card'>
@@ -263,21 +334,21 @@ if selected_page == "🌟 Executive Overview":
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
     
     # Track Cards
     st.subheader("📌 Capstone Problem Tracks At A Glance")
-    t1, t2, t3 = st.columns(3)
+    t1, t2, t3 = st.columns(3, gap="medium")
     
     with t1:
         st.markdown("""
-        <div class='metric-card'>
+        <div class='metric-card' style='height: 100%;'>
             <span class='badge badge-blue'>Track 1 — Regression</span>
-            <h4 style='margin-top:0.6rem;'>Metro Traffic Volume</h4>
-            <p style='font-size:0.88rem; color:#475569;'>
+            <h4 style='margin-top:0.75rem; margin-bottom:0.4rem; color:var(--text-color);'>Metro Traffic Volume</h4>
+            <p style='font-size:0.88rem; color:var(--text-color); opacity:0.85; line-height:1.55;'>
                 Predict hourly eastbound traffic volume on Interstate 94 in Minneapolis-St. Paul using temporal and weather attributes.
             </p>
-            <ul style='font-size:0.82rem; color:#334155; padding-left:1.2rem;'>
+            <ul style='font-size:0.82rem; color:var(--text-color); opacity:0.85; padding-left:1.2rem; line-height:1.65;'>
                 <li><b>Dataset:</b> 48,204 rows × 9 columns</li>
                 <li><b>Target:</b> <code>traffic_volume</code> (veh/hr)</li>
                 <li><b>Top Model:</b> Gradient Boosting (R² = 0.9529)</li>
@@ -288,13 +359,13 @@ if selected_page == "🌟 Executive Overview":
         
     with t2:
         st.markdown("""
-        <div class='metric-card'>
+        <div class='metric-card' style='height: 100%;'>
             <span class='badge badge-green'>Track 2 — Classification</span>
-            <h4 style='margin-top:0.6rem;'>Bank Marketing Term Deposit</h4>
-            <p style='font-size:0.88rem; color:#475569;'>
+            <h4 style='margin-top:0.75rem; margin-bottom:0.4rem; color:var(--text-color);'>Bank Marketing Term Deposit</h4>
+            <p style='font-size:0.88rem; color:var(--text-color); opacity:0.85; line-height:1.55;'>
                 Predict whether a telemarketing client will subscribe to a term deposit. Addressed class imbalance (88.3% vs 11.7%).
             </p>
-            <ul style='font-size:0.82rem; color:#334155; padding-left:1.2rem;'>
+            <ul style='font-size:0.82rem; color:var(--text-color); opacity:0.85; padding-left:1.2rem; line-height:1.65;'>
                 <li><b>Dataset:</b> 45,211 rows × 17 columns</li>
                 <li><b>Target:</b> <code>y</code> (binary: 0 / 1)</li>
                 <li><b>Leakage Guard:</b> <code>duration</code> strictly excluded</li>
@@ -305,13 +376,13 @@ if selected_page == "🌟 Executive Overview":
         
     with t3:
         st.markdown("""
-        <div class='metric-card'>
+        <div class='metric-card' style='height: 100%;'>
             <span class='badge badge-purple'>Track 3 — Clustering</span>
-            <h4 style='margin-top:0.6rem;'>Retail Customer Segmentation</h4>
-            <p style='font-size:0.88rem; color:#475569;'>
+            <h4 style='margin-top:0.75rem; margin-bottom:0.4rem; color:var(--text-color);'>Retail Customer Segmentation</h4>
+            <p style='font-size:0.88rem; color:var(--text-color); opacity:0.85; line-height:1.55;'>
                 Unsupervised customer segmentation on transaction logs via Recency, Frequency, Monetary (RFM) feature engineering.
             </p>
-            <ul style='font-size:0.82rem; color:#334155; padding-left:1.2rem;'>
+            <ul style='font-size:0.82rem; color:var(--text-color); opacity:0.85; padding-left:1.2rem; line-height:1.65;'>
                 <li><b>Dataset:</b> 525,461 raw transaction rows</li>
                 <li><b>Preprocessing:</b> log1p + StandardScaler</li>
                 <li><b>Algorithms:</b> K-Means & Agglomerative Hierarchical</li>
@@ -320,7 +391,7 @@ if selected_page == "🌟 Executive Overview":
         </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
     st.subheader("🏗️ Production Architecture & Pipeline Hygiene")
     st.markdown(r"""
     - **No Data Snooping:** All transformations (`StandardScaler`, `OneHotEncoder`) were strictly fitted on training splits only inside scikit-learn `Pipeline` and `ColumnTransformer` objects.
@@ -355,7 +426,7 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
             use_container_width=True
         )
         
-        col_c1, col_c2 = st.columns(2)
+        col_c1, col_c2 = st.columns(2, gap="medium")
         with col_c1:
             fig_r2 = px.bar(
                 REGRESSION_BENCHMARK.sort_values("Test R²", ascending=True),
@@ -368,7 +439,7 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
                 text="Test R²"
             )
             fig_r2.update_traces(texttemplate='%{text:.4f}', textposition='outside')
-            fig_r2.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10))
+            fig_r2.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_r2, use_container_width=True)
             
         with col_c2:
@@ -383,26 +454,32 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
                 text="RMSE (veh/hr)"
             )
             fig_rmse.update_traces(texttemplate='%{text:.1f}', textposition='outside')
-            fig_rmse.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10))
+            fig_rmse.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_rmse, use_container_width=True)
 
     with tab_sim:
         st.subheader("⚡ Real-Time Traffic Volume Prediction Simulator")
         st.markdown("Adjust environmental and temporal factors below to predict real-time traffic flow via our fitted **Gradient Boosting Regressor** pipeline.")
         
-        sim_col1, sim_col2, sim_col3 = st.columns(3)
-        with sim_col1:
-            hour_val = st.slider("Hour of Day (24h)", min_value=0, max_value=23, value=17, help="Circadian traffic driver (rush hour: 7-9 AM, 4-6 PM)")
-            day_val = st.selectbox("Day of Week", options=[0, 1, 2, 3, 4, 5, 6], format_func=lambda x: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][x], index=2)
-            month_val = st.slider("Month of Year", min_value=1, max_value=12, value=10)
-        with sim_col2:
-            temp_c = st.slider("Temperature (°C)", min_value=-30.0, max_value=40.0, value=15.0)
-            weather_cat = st.selectbox("Primary Weather Category", options=['Clouds', 'Clear', 'Rain', 'Drizzle', 'Mist', 'Haze', 'Fog', 'Snow', 'Thunderstorm', 'Squall', 'Smoke'])
-            clouds_pct = st.slider("Cloud Coverage (%)", min_value=0, max_value=100, value=40)
-        with sim_col3:
-            rain_mm = st.number_input("Past 1h Rainfall (mm)", min_value=0.0, max_value=100.0, value=0.0, step=0.5)
-            snow_mm = st.number_input("Past 1h Snowfall (mm)", min_value=0.0, max_value=50.0, value=0.0, step=0.1)
-            is_holiday_flag = st.checkbox("Is Public Holiday?", value=False)
+        with st.container(border=True):
+            st.markdown("##### ⚙️ Simulation Input Parameters")
+            sim_col1, sim_col2, sim_col3 = st.columns(3, gap="medium")
+            with sim_col1:
+                st.caption("🗓️ **Temporal Factors**")
+                hour_val = st.slider("Hour of Day (24h)", min_value=0, max_value=23, value=17, help="Circadian traffic driver (rush hour: 7-9 AM, 4-6 PM)")
+                day_val = st.selectbox("Day of Week", options=[0, 1, 2, 3, 4, 5, 6], format_func=lambda x: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][x], index=2)
+                month_val = st.slider("Month of Year", min_value=1, max_value=12, value=10)
+            with sim_col2:
+                st.caption("⛅ **Weather & Atmosphere**")
+                temp_c = st.slider("Temperature (°C)", min_value=-30.0, max_value=40.0, value=15.0)
+                weather_cat = st.selectbox("Primary Weather Category", options=['Clouds', 'Clear', 'Rain', 'Drizzle', 'Mist', 'Haze', 'Fog', 'Snow', 'Thunderstorm', 'Squall', 'Smoke'])
+                clouds_pct = st.slider("Cloud Coverage (%)", min_value=0, max_value=100, value=40)
+            with sim_col3:
+                st.caption("🌧️ **Precipitation & Road Conditions**")
+                rain_mm = st.number_input("Past 1h Rainfall (mm)", min_value=0.0, max_value=100.0, value=0.0, step=0.5)
+                snow_mm = st.number_input("Past 1h Snowfall (mm)", min_value=0.0, max_value=50.0, value=0.0, step=0.1)
+                st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+                is_holiday_flag = st.checkbox("Public Holiday (Off-peak commute)", value=False)
             
         is_weekend_flag = 1 if day_val >= 5 else 0
         hour_sin = np.sin(2 * np.pi * hour_val / 24.0)
@@ -426,8 +503,9 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
         if 'reg_pipe' in artifacts:
             pred_vol = max(0.0, float(artifacts['reg_pipe'].predict(input_data)[0]))
             
-            st.markdown("<br>", unsafe_allow_html=True)
-            res_col1, res_col2 = st.columns([1, 2])
+            st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+            st.markdown("##### 🎯 Real-Time Inference Output")
+            res_col1, res_col2 = st.columns([1.1, 1.3], gap="large")
             
             with res_col1:
                 # Congestion badge and gauge status
@@ -449,11 +527,11 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
                     status_desc = "Major bottleneck gridlock; maximum highway density."
                 
                 st.markdown(f"""
-                <div class='metric-card' style='border-left: 5px solid {status_color};'>
-                    <div class='metric-title'>Predicted Hourly Traffic</div>
-                    <div class='metric-value' style='color:{status_color};'>{pred_vol:,.0f} <span style='font-size:1rem; font-weight:600;'>veh/hr</span></div>
-                    <div style='font-weight:700; font-size:1.05rem; margin-top:0.4rem;'>{status_text}</div>
-                    <div style='font-size:0.85rem; color:#64748b; margin-top:0.2rem;'>{status_desc}</div>
+                <div class='metric-card' style='border-left: 5px solid {status_color}; height: 100%; display: flex; flex-direction: column; justify-content: center;'>
+                    <div class='metric-title'>Predicted Hourly Traffic Volume</div>
+                    <div class='metric-value' style='color:{status_color}; font-size: 2.2rem;'>{pred_vol:,.0f} <span style='font-size:1.05rem; font-weight:600; opacity:0.8;'>veh/hr</span></div>
+                    <div style='font-weight:700; font-size:1.15rem; margin-top:0.45rem; color:var(--text-color);'>{status_text}</div>
+                    <div style='font-size:0.88rem; color:var(--text-color); opacity:0.75; margin-top:0.35rem; line-height:1.4;'>{status_desc}</div>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -462,24 +540,30 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
                     mode = "gauge+number",
                     value = pred_vol,
                     domain = {'x': [0, 1], 'y': [0, 1]},
-                    title = {'text': "<b>Traffic Density Gauge (Capacity: 7,200 veh/hr)</b>", 'font': {'size': 14}},
+                    title = {'text': "<b>Traffic Density Gauge (Capacity: 7,200 veh/hr)</b>", 'font': {'size': 13, 'color': 'rgba(150, 150, 150, 0.95)'}},
                     gauge = {
-                        'axis': {'range': [0, 7200], 'tickwidth': 1},
+                        'axis': {'range': [0, 7200], 'tickwidth': 1, 'tickcolor': 'rgba(150, 150, 150, 0.6)'},
                         'bar': {'color': status_color},
                         'steps': [
-                            {'range': [0, 1500], 'color': "#ecfdf5"},
-                            {'range': [1500, 3500], 'color': "#fef3c7"},
-                            {'range': [3500, 5200], 'color': "#ffedd5"},
-                            {'range': [5200, 7200], 'color': "#fee2e2"}
+                            {'range': [0, 1500], 'color': "rgba(16, 185, 129, 0.22)"},
+                            {'range': [1500, 3500], 'color': "rgba(245, 158, 11, 0.22)"},
+                            {'range': [3500, 5200], 'color': "rgba(249, 115, 22, 0.22)"},
+                            {'range': [5200, 7200], 'color': "rgba(239, 68, 68, 0.22)"}
                         ],
                         'threshold': {
-                            'line': {'color': "black", 'width': 3},
+                            'line': {'color': "#f43f5e", 'width': 3},
                             'thickness': 0.75,
                             'value': 5200
                         }
                     }
                 ))
-                fig_gauge.update_layout(height=260, margin=dict(l=10, r=10, t=30, b=10))
+                fig_gauge.update_layout(
+                    height=260, 
+                    margin=dict(l=15, r=15, t=30, b=10),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='rgba(150, 150, 150, 0.95)')
+                )
                 st.plotly_chart(fig_gauge, use_container_width=True)
         else:
             st.warning("Pre-trained regression model artifact not loaded. Showing simulated baseline calculation.")
@@ -488,7 +572,7 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
         st.subheader("🔬 Model Diagnostics & Feature Explanations")
         if 'reg_diag' in artifacts:
             diag_df = artifacts['reg_diag']
-            col_d1, col_d2 = st.columns(2)
+            col_d1, col_d2 = st.columns(2, gap="medium")
             with col_d1:
                 fig_scat = px.scatter(
                     diag_df, x="Actual", y="Predicted", opacity=0.35,
@@ -496,8 +580,8 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
                     labels={"Actual": "Ground Truth (veh/hr)", "Predicted": "Predicted (veh/hr)"},
                     color_discrete_sequence=['#2563eb']
                 )
-                fig_scat.add_trace(go.Scatter(x=[0, 7500], y=[0, 7500], mode='lines', name='1:1 Line', line=dict(color='red', dash='dash')))
-                fig_scat.update_layout(height=420)
+                fig_scat.add_trace(go.Scatter(x=[0, 7500], y=[0, 7500], mode='lines', name='1:1 Line', line=dict(color='#ef4444', dash='dash')))
+                fig_scat.update_layout(height=420, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_scat, use_container_width=True)
             with col_d2:
                 fig_res = px.histogram(
@@ -506,8 +590,8 @@ elif selected_page == "🚗 Track 1: Regression (10 Models)":
                     labels={"Residual": "Residual (veh/hr)"},
                     color_discrete_sequence=['#059669']
                 )
-                fig_res.add_vline(x=0, line_dash="dash", line_color="red")
-                fig_res.update_layout(height=420)
+                fig_res.add_vline(x=0, line_dash="dash", line_color="#ef4444")
+                fig_res.update_layout(height=420, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
                 st.plotly_chart(fig_res, use_container_width=True)
 
         st.markdown("#### 🌲 Top Predictive Features (Gradient Boosting vs Random Forest)")
@@ -548,7 +632,7 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
             use_container_width=True
         )
         
-        col_bar1, col_bar2 = st.columns(2)
+        col_bar1, col_bar2 = st.columns(2, gap="medium")
         with col_bar1:
             fig_f1 = px.bar(
                 CLASSIFICATION_BENCHMARK.sort_values("Weighted F1", ascending=True),
@@ -557,7 +641,7 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                 title="<b>Weighted F1-Score Benchmark (All 10 Classifiers)</b>"
             )
             fig_f1.update_traces(texttemplate='%{text:.4f}', textposition='outside')
-            fig_f1.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10))
+            fig_f1.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_f1, use_container_width=True)
             
         with col_bar2:
@@ -568,34 +652,59 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                 title="<b>ROC-AUC Class Discrimination Benchmark (All 10 Classifiers)</b>"
             )
             fig_auc.update_traces(texttemplate='%{text:.4f}', textposition='outside')
-            fig_auc.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10))
+            fig_auc.update_layout(height=450, margin=dict(l=10, r=30, t=40, b=10), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_auc, use_container_width=True)
 
     with tab_cls_lead_sim:
         st.subheader("🎯 Interactive Telemarketing Lead Qualification Simulator")
         st.markdown("Input prospective client attributes to generate an instant conversion probability and operational recommendation via **Gradient Boosting Classifier**.")
         
-        c_col1, c_col2, c_col3 = st.columns(3)
-        with c_col1:
-            age_c = st.slider("Client Age", 18, 95, 38)
-            job_c = st.selectbox("Job Category", ['management', 'technician', 'blue-collar', 'admin.', 'services', 'retired', 'self-employed', 'student', 'unemployed', 'entrepreneur', 'housemaid'])
-            marital_c = st.selectbox("Marital Status", ['married', 'single', 'divorced'])
-            education_c = st.selectbox("Education Level", ['tertiary', 'secondary', 'primary', 'unknown'])
-        with c_col2:
-            balance_c = st.number_input("Average Yearly Balance (€)", -5000, 100000, 2400, step=500)
-            housing_c = st.selectbox("Has Housing Loan?", ['no', 'yes'])
-            loan_c = st.selectbox("Has Personal Loan?", ['no', 'yes'])
-            default_c = st.selectbox("Has Credit in Default?", ['no', 'yes'])
-        with c_col3:
-            contact_c = st.selectbox("Contact Communication Type", ['cellular', 'telephone', 'unknown'])
-            month_c = st.selectbox("Contact Month", ['oct', 'may', 'jun', 'jul', 'aug', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'sep'])
-            poutcome_c = st.selectbox("Previous Campaign Outcome", ['success', 'failure', 'other', 'unknown'])
-            pdays_c = st.number_input("Days Since Previous Contact (-1 = never)", -1, 999, 90)
-            previous_c = st.slider("Number of Contacts Before Campaign", 0, 30, 2)
-            campaign_c = st.slider("Contacts During This Campaign", 1, 20, 1)
+        with st.container(border=True):
+            st.markdown("##### ⚙️ Lead Profile & Campaign Attributes")
+            
+            st.caption("👤 **Client Demographics & Employment**")
+            c_d1, c_d2, c_d3, c_d4 = st.columns(4, gap="medium")
+            with c_d1:
+                age_c = st.slider("Client Age", 18, 95, 38)
+            with c_d2:
+                job_c = st.selectbox("Job Category", ['management', 'technician', 'blue-collar', 'admin.', 'services', 'retired', 'self-employed', 'student', 'unemployed', 'entrepreneur', 'housemaid'])
+            with c_d3:
+                marital_c = st.selectbox("Marital Status", ['married', 'single', 'divorced'])
+            with c_d4:
+                education_c = st.selectbox("Education Level", ['tertiary', 'secondary', 'primary', 'unknown'])
+            
+            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+            st.caption("💳 **Financial Profile & Credit History**")
+            c_f1, c_f2, c_f3, c_f4 = st.columns(4, gap="medium")
+            with c_f1:
+                balance_c = st.number_input("Average Yearly Balance (€)", -5000, 100000, 2400, step=500)
+            with c_f2:
+                housing_c = st.selectbox("Has Housing Loan?", ['no', 'yes'])
+            with c_f3:
+                loan_c = st.selectbox("Has Personal Loan?", ['no', 'yes'])
+            with c_f4:
+                default_c = st.selectbox("Has Credit in Default?", ['no', 'yes'])
+                
+            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+            st.caption("📞 **Outreach Channel & Campaign History**")
+            c_c1, c_c2, c_c3, c_c4 = st.columns(4, gap="medium")
+            with c_c1:
+                contact_c = st.selectbox("Communication Type", ['cellular', 'telephone', 'unknown'])
+            with c_c2:
+                month_c = st.selectbox("Contact Month", ['oct', 'may', 'jun', 'jul', 'aug', 'nov', 'dec', 'jan', 'feb', 'mar', 'apr', 'sep'])
+            with c_c3:
+                poutcome_c = st.selectbox("Previous Outcome", ['success', 'failure', 'other', 'unknown'])
+            with c_c4:
+                pdays_c = st.number_input("Days Since Prev Contact (-1 = never)", -1, 999, 90)
+                
+            c_sub1, c_sub2 = st.columns(2, gap="medium")
+            with c_sub1:
+                previous_c = st.slider("Number of Contacts Before Campaign", 0, 30, 2)
+            with c_sub2:
+                campaign_c = st.slider("Contacts During This Campaign", 1, 20, 1)
 
-        st.markdown("---")
-        threshold_slider = st.slider("⚖️ Operational Decision Cutoff Threshold", 0.05, 0.95, 0.30, 0.05, help="Due to 88.3% vs 11.7% class imbalance, a lower cutoff (e.g. 0.30) maximizes minority recall, ensuring high-value conversion leads are not missed.")
+            st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+            threshold_slider = st.slider("⚖️ Operational Decision Cutoff Threshold", 0.05, 0.95, 0.30, 0.05, help="Due to 88.3% vs 11.7% class imbalance, a lower cutoff (e.g. 0.30) maximizes minority recall, ensuring high-value conversion leads are not missed.")
 
         input_cls = pd.DataFrame([{
             'age': age_c,
@@ -619,7 +728,9 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
             sub_prob = float(artifacts['cls_pipe'].predict_proba(input_cls)[0, 1])
             is_converted = sub_prob >= threshold_slider
             
-            c_res1, c_res2 = st.columns([1, 2])
+            st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
+            st.markdown("##### 🎯 Lead Scoring & Conversion Output")
+            c_res1, c_res2 = st.columns([1.1, 1.3], gap="large")
             with c_res1:
                 if sub_prob >= 0.60:
                     tier_badge = "🌟 Platinum Lead"
@@ -639,12 +750,12 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                     tier_action = "Do Not Call: Avoid wasteful telemarketing expenditure."
                 
                 st.markdown(f"""
-                <div class='metric-card' style='border-left: 5px solid {tier_color};'>
+                <div class='metric-card' style='border-left: 5px solid {tier_color}; height: 100%; display: flex; flex-direction: column; justify-content: center;'>
                     <div class='metric-title'>Subscription Probability</div>
-                    <div class='metric-value' style='color:{tier_color};'>{sub_prob * 100:.1f}%</div>
-                    <div style='font-weight:700; font-size:1.05rem; margin-top:0.4rem;'>{tier_badge}</div>
-                    <div style='font-size:0.85rem; color:#475569; margin-top:0.4rem;'><b>Threshold Decision:</b> {'✅ PREDICTED TO SUBSCRIBE' if is_converted else '❌ NOT SUBSCRIBING'}</div>
-                    <div style='font-size:0.8rem; color:#64748b; margin-top:0.3rem;'>{tier_action}</div>
+                    <div class='metric-value' style='color:{tier_color}; font-size: 2.2rem;'>{sub_prob * 100:.1f}%</div>
+                    <div style='font-weight:700; font-size:1.15rem; margin-top:0.45rem; color:var(--text-color);'>{tier_badge}</div>
+                    <div style='font-size:0.88rem; color:var(--text-color); opacity:0.85; margin-top:0.4rem;'><b>Threshold Decision:</b> {'✅ PREDICTED TO SUBSCRIBE' if is_converted else '❌ NOT SUBSCRIBING'}</div>
+                    <div style='font-size:0.82rem; color:var(--text-color); opacity:0.75; margin-top:0.35rem; line-height:1.4;'>{tier_action}</div>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -653,31 +764,37 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                     mode = "gauge+number",
                     value = sub_prob * 100,
                     number = {'suffix': "%"},
-                    title = {'text': "<b>Lead Conversion Probability vs Decision Cutoff</b>", 'font': {'size': 14}},
+                    title = {'text': "<b>Lead Conversion Probability vs Decision Cutoff</b>", 'font': {'size': 13, 'color': 'rgba(150, 150, 150, 0.95)'}},
                     gauge = {
-                        'axis': {'range': [0, 100]},
+                        'axis': {'range': [0, 100], 'tickcolor': 'rgba(150, 150, 150, 0.6)'},
                         'bar': {'color': tier_color},
                         'steps': [
-                            {'range': [0, 20], 'color': "#fee2e2"},
-                            {'range': [20, 40], 'color': "#fef3c7"},
-                            {'range': [40, 60], 'color': "#dbeafe"},
-                            {'range': [60, 100], 'color': "#d1fae5"}
+                            {'range': [0, 20], 'color': "rgba(239, 68, 68, 0.22)"},
+                            {'range': [20, 40], 'color': "rgba(245, 158, 11, 0.22)"},
+                            {'range': [40, 60], 'color': "rgba(59, 130, 246, 0.22)"},
+                            {'range': [60, 100], 'color': "rgba(16, 185, 129, 0.22)"}
                         ],
                         'threshold': {
-                            'line': {'color': "black", 'width': 3},
+                            'line': {'color': "#f43f5e", 'width': 3},
                             'thickness': 0.75,
                             'value': threshold_slider * 100
                         }
                     }
                 ))
-                fig_prob.update_layout(height=260, margin=dict(l=10, r=10, t=30, b=10))
+                fig_prob.update_layout(
+                    height=260, 
+                    margin=dict(l=15, r=15, t=30, b=10),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    font=dict(color='rgba(150, 150, 150, 0.95)')
+                )
                 st.plotly_chart(fig_prob, use_container_width=True)
         else:
             st.warning("Classification pipeline artifact not loaded.")
 
     with tab_cls_roc:
         st.subheader("📈 Multi-Model Discrimination & Error Analysis")
-        col_cm, col_roc = st.columns([1, 1])
+        col_cm, col_roc = st.columns([1, 1], gap="large")
         
         with col_cm:
             st.markdown("#### 🔍 Confusion Matrix Inspector")
@@ -707,7 +824,7 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                 color_continuous_scale="Blues",
                 title=f"<b>{selected_cm_model} — Confusion Matrix</b>"
             )
-            fig_cm.update_layout(height=380)
+            fig_cm.update_layout(height=380, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_cm, use_container_width=True)
             
         with col_roc:
@@ -723,13 +840,15 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                 tpr_curve = 1 - (1 - fpr_space) ** power
                 fig_roc.add_trace(go.Scatter(x=fpr_space, y=tpr_curve, mode='lines', name=f"{row['Model']} (AUC = {auc_score:.4f})", lw=2))
                 
-            fig_roc.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name="Chance (AUC = 0.5000)", line=dict(color='black', dash='dash')))
+            fig_roc.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name="Chance (AUC = 0.5000)", line=dict(color='#94a3b8', dash='dash')))
             fig_roc.update_layout(
                 title="<b>Top 5 Classifiers ROC Curves</b>",
                 xaxis_title="False Positive Rate (1 - Specificity)",
                 yaxis_title="True Positive Rate (Sensitivity)",
                 height=380,
-                legend=dict(x=0.45, y=0.1)
+                legend=dict(x=0.45, y=0.1),
+                paper_bgcolor='rgba(0,0,0,0)',
+                plot_bgcolor='rgba(0,0,0,0)'
             )
             st.plotly_chart(fig_roc, use_container_width=True)
 
@@ -759,33 +878,33 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
             use_container_width=True
         )
         
-        c_k1, c_k2, c_k3 = st.columns(3)
+        c_k1, c_k2, c_k3 = st.columns(3, gap="medium")
         with c_k1:
             st.markdown("""
             <div class='metric-card'>
                 <div class='metric-title'>Silhouette Score</div>
-                <div class='metric-value' style='color:#2563eb;'>0.3821</div>
-                <div style='font-size:0.8rem; color:#64748b;'>Dense within-cluster cohesion and clear separation margins.</div>
+                <div class='metric-value' style='color:#3b82f6;'>0.3821</div>
+                <div style='font-size:0.84rem; color:var(--text-color); opacity:0.75; line-height:1.4;'>Dense within-cluster cohesion and clear separation margins.</div>
             </div>
             """, unsafe_allow_html=True)
         with c_k2:
             st.markdown("""
             <div class='metric-card'>
                 <div class='metric-title'>Davies-Bouldin Index</div>
-                <div class='metric-value' style='color:#059669;'>0.9412</div>
-                <div style='font-size:0.8rem; color:#64748b;'>Low ratio of within-cluster scatter to between-cluster distance.</div>
+                <div class='metric-value' style='color:#10b981;'>0.9412</div>
+                <div style='font-size:0.84rem; color:var(--text-color); opacity:0.75; line-height:1.4;'>Low ratio of within-cluster scatter to between-cluster distance.</div>
             </div>
             """, unsafe_allow_html=True)
         with c_k3:
             st.markdown("""
             <div class='metric-card'>
                 <div class='metric-title'>Calinski-Harabasz Index</div>
-                <div class='metric-value' style='color:#7c3aed;'>2,684.5</div>
-                <div style='font-size:0.8rem; color:#64748b;'>High variance ratio between clusters relative to within clusters.</div>
+                <div class='metric-value' style='color:#8b5cf6;'>2,684.5</div>
+                <div style='font-size:0.84rem; color:var(--text-color); opacity:0.75; line-height:1.4;'>High variance ratio between clusters relative to within clusters.</div>
             </div>
             """, unsafe_allow_html=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
         st.subheader("📈 Clustering Methodology & Optimal k Selection")
         st.markdown("""
         - **Recency (R):** Days since the customer's last invoice date.
@@ -799,13 +918,15 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
         st.subheader("🏆 Interactive Customer Persona Classifier & Action Strategy")
         st.markdown("Enter customer purchasing metrics to assign them to their optimal behavioral segment.")
         
-        p_c1, p_c2, p_c3 = st.columns(3)
-        with p_c1:
-            in_recency = st.slider("Recency (Days since last order)", 1, 365, 18, help="Lower is better (bought recently)")
-        with p_c2:
-            in_frequency = st.slider("Frequency (Total orders placed)", 1, 100, 8, help="Higher is better (frequent buyer)")
-        with p_c3:
-            in_monetary = st.number_input("Monetary Value (Total spend in £)", 10.0, 50000.0, 1850.0, step=100.0)
+        with st.container(border=True):
+            st.markdown("##### ⚙️ Customer RFM Input Metrics")
+            p_c1, p_c2, p_c3 = st.columns(3, gap="medium")
+            with p_c1:
+                in_recency = st.slider("Recency (Days since last order)", 1, 365, 18, help="Lower is better (bought recently)")
+            with p_c2:
+                in_frequency = st.slider("Frequency (Total orders placed)", 1, 100, 8, help="Higher is better (frequent buyer)")
+            with p_c3:
+                in_monetary = st.number_input("Monetary Value (Total spend in £)", 10.0, 50000.0, 1850.0, step=100.0)
             
         in_aov = in_monetary / in_frequency
         
@@ -867,15 +988,15 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
             # Get persona details
             p_info = persona_definitions.get(c_label, persona_definitions[1])
             
-            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 16px;'></div>", unsafe_allow_html=True)
             st.markdown(f"""
             <div class='metric-card' style='border-left: 6px solid {p_info['color']};'>
-                <span class='badge' style='background-color:{p_info['color']}; color:white;'>Segment {c_label}</span>
-                <h3 style='color:{p_info['color']}; margin-top:0.4rem;'>{p_info['title']}</h3>
-                <p style='font-size:0.95rem; color:#475569;'><b>Profile:</b> {p_info['desc']}</p>
-                <div style='background:#f8fafc; padding:0.8rem; border-radius:8px; border:1px solid #e2e8f0; margin-top:0.5rem;'>
-                    <b>🎯 Tailored Business Growth Strategy:</b>
-                    <ul style='margin-top:0.3rem; margin-bottom:0;'>
+                <span class='badge' style='background-color:{p_info['color']}; color:white; border:none;'>Segment {c_label}</span>
+                <h3 style='color:{p_info['color']}; margin-top:0.6rem; margin-bottom:0.4rem;'>{p_info['title']}</h3>
+                <p style='font-size:0.95rem; color:var(--text-color); opacity:0.85;'><b>Profile:</b> {p_info['desc']}</p>
+                <div class='subcard-box'>
+                    <b style='color:var(--text-color);'>🎯 Tailored Business Growth Strategy:</b>
+                    <ul style='margin-top:0.4rem; margin-bottom:0; color:var(--text-color); opacity:0.85; padding-left:1.2rem; line-height:1.6;'>
                         {''.join([f"<li>{act}</li>" for act in p_info['actions']])}
                     </ul>
                 </div>
@@ -915,7 +1036,7 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
                 
         pca_df = pd.DataFrame(pca_data)
         
-        col_pca2d, col_pca3d = st.columns(2)
+        col_pca2d, col_pca3d = st.columns(2, gap="large")
         with col_pca2d:
             fig_pca2d = px.scatter(
                 pca_df,
@@ -925,7 +1046,7 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
                 title="<b>2D PCA Cluster Projection (Mandatory Review 2 Deliverable)</b>",
                 color_discrete_sequence=['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6']
             )
-            fig_pca2d.update_layout(height=420)
+            fig_pca2d.update_layout(height=420, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_pca2d, use_container_width=True)
             
         with col_pca3d:
@@ -938,7 +1059,7 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
                 title="<b>3D PCA Cluster Manifold Explorer</b>",
                 color_discrete_sequence=['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6']
             )
-            fig_pca3d.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10))
+            fig_pca3d.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10), paper_bgcolor='rgba(0,0,0,0)')
             st.plotly_chart(fig_pca3d, use_container_width=True)
 
 
