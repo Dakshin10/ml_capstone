@@ -202,7 +202,6 @@ For public cloud hosting (Streamlit Community Cloud or Render), refer to [`app/R
 ## 6. Author Information & Academic Attribution
 
 - **Course:** 23CSE301 — Machine Learning
-- **Institution:** Amrita Vishwa Vidyapeetham
 - **Academic Year:** 2026–2027
 - **Deliverables:** Review 1 & Review 2 Capstone Deliverables
 - **License:** MIT License

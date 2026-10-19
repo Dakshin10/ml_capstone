@@ -208,8 +208,7 @@ with st.sidebar:
             "🌟 Executive Overview",
             "🚗 Track 1: Regression (10 Models)",
             "🏦 Track 2: Classification (10 Models)",
-            "🛍️ Track 3: Clustering (RFM Segmentation)",
-            "📋 Rubric & Viva Preparation"
+            "🛍️ Track 3: Clustering (RFM Segmentation)"
         ],
         index=0
     )
@@ -220,9 +219,7 @@ with st.sidebar:
     st.success("✔ All 10 Classification Models")
     st.success("✔ K-Means & Hierarchical Clustering")
     st.info("⚡ Interactive Live Inference Enabled")
-    
-    st.markdown("---")
-    st.caption("Amrita Vishwa Vidyapeetham | Academic Year 2026-27")
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PAGE 1: EXECUTIVE OVERVIEW
@@ -944,69 +941,4 @@ elif selected_page == "🛍️ Track 3: Clustering (RFM Segmentation)":
             fig_pca3d.update_layout(height=420, margin=dict(l=10, r=10, t=30, b=10))
             st.plotly_chart(fig_pca3d, use_container_width=True)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# PAGE 5: RUBRIC & VIVA PREPARATION
-# ─────────────────────────────────────────────────────────────────────────────
-elif selected_page == "📋 Rubric & Viva Preparation":
-    st.markdown("<div class='main-title'>Capstone Rubric & Technical Viva Guide</div>", unsafe_allow_html=True)
-    st.markdown("<div class='subtitle'>Evaluation Criteria & Technical Defense Reference for Review 1 & Review 2</div>", unsafe_allow_html=True)
-    
-    col_r1, col_r2 = st.columns(2)
-    with col_r1:
-        st.markdown("""
-        <div class='metric-card'>
-            <span class='badge badge-blue'>Review 1 — Mid-Semester</span>
-            <h3 style='margin-top:0.4rem;'>25 Marks Total</h3>
-            <ul style='font-size:0.88rem; color:#334155;'>
-                <li><b>Dataset & EDA (4 Marks):</b> Shape, types, nulls, distribution plots, correlation heatmap, insight commentary.</li>
-                <li><b>Preprocessing (3 Marks):</b> Missing data strategy, scaling fit strictly on train split, feature engineering.</li>
-                <li><b>Regression Track (9 Marks):</b> All 10 models trained, single comparative summary table, hyperparameter tuning, residual & actual-vs-predicted plots.</li>
-                <li><b>Classification Part A (3 Marks):</b> All 5 models (Logistic, KNN, NB, Decision Tree, SVC), confusion matrices, weighted F1.</li>
-                <li><b>Presentation & Viva (6 Marks):</b> Narrative clarity and technical defense.</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    with col_r2:
-        st.markdown("""
-        <div class='metric-card'>
-            <span class='badge badge-green'>Review 2 — End-Semester</span>
-            <h3 style='margin-top:0.4rem;'>25 Marks + Up to 2 Bonus</h3>
-            <ul style='font-size:0.88rem; color:#334155;'>
-                <li><b>Classification Part B (6 Marks):</b> All 5 Part-B models, single consolidated 10-algorithm table, ROC-AUC and F1.</li>
-                <li><b>Clustering Track (8 Marks):</b> Both K-Means and Hierarchical, Silhouette, Davies-Bouldin, Calinski-Harabasz, Elbow & Dendrogram, PCA 2D scatter.</li>
-                <li><b>Pipeline Quality & Repo (3 Marks):</b> Clean 0-error notebooks, comprehensive README, modular code.</li>
-                <li><b>Presentation & Viva (8 Marks):</b> Deep conceptual comprehension across all team members.</li>
-                <li><b>Bonus (+2 Marks):</b> Interactive Streamlit GUI (+1) and public deployment (+1).</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("💡 Technical Viva Defense Cheat Sheet")
-    
-    with st.expander("Q1: Why is `duration` excluded from the Bank Marketing classification pipeline?"):
-        st.write("""
-        `duration` is the length of the telemarketing phone call in seconds. This variable is strictly **unavailable prior to placing the call**. Furthermore, if a call duration is long, it almost always indicates a successful subscription. Retaining `duration` causes severe **data leakage**, resulting in unrealistically inflated benchmark metrics that will fail in live production.
-        """)
-        
-    with st.expander("Q2: Why is feature scaling mandatory for SVR, KNN, and K-Means, but optional for Decision Trees?"):
-        st.write(r"""
-        SVR, KNN, and K-Means are **distance-based algorithms** computing Euclidean distances ($\|x_i - x_j\|_2$) or dot products in kernel space. If features possess unequal scales (e.g. balance $\sim 10,000$ vs. age $\sim 40$), the larger-magnitude variable will dominate the distance metric. In contrast, Decision Trees and Tree Ensembles perform axis-aligned orthogonal splits based on monotonic ordering, making them scale-invariant.
-        """)
-        
-    with st.expander("Q3: Why is Weighted F1-Score used instead of Accuracy for classification evaluation?"):
-        st.write("""
-        The bank dataset exhibits severe **class imbalance** (88.3% non-subscribers vs. 11.7% subscribers). A naive baseline predicting `'no'` for every customer achieves 88.3% accuracy while capturing 0% of subscribers. Weighted F1 computes the harmonic mean of Precision and Recall weighted by class support, penalizing blind majority-class bias.
-        """)
-        
-    with st.expander("Q4: How does Gradient Boosting differ fundamentally from Random Forest?"):
-        st.write("""
-        - **Random Forest (Bagging):** Fits independent deep trees in parallel on bootstrap samples and averages their outputs. Primary goal: **reduce variance**.
-        - **Gradient Boosting (Boosting):** Fits sequential shallow trees iteratively to the negative gradient (pseudo-residuals) of the loss function. Primary goal: **reduce bias**.
-        """)
-        
-    with st.expander("Q5: Why apply log-transformation (log1p) before clustering?"):
-        st.write(r"""
-        Raw transaction monetary and frequency metrics display heavy power-law / Pareto right-skewness with extreme outliers. Fitting K-Means on unscaled raw data causes outlier customers to pull cluster centroids away from the bulk of the distribution. Applying $\log(1 + X)$ compresses high-variance distributions into approximately normal bell-curves, enabling spherical distance metrics to identify meaningful customer cohorts.
-        """)
