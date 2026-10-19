@@ -237,14 +237,14 @@ artifacts = load_models()
 REGRESSION_BENCHMARK = pd.DataFrame([
     {"Rank": 1, "Algorithm": "Gradient Boosting Regressor", "Test R²": 0.9529, "RMSE (veh/hr)": 430.65, "MAE (veh/hr)": 255.57, "5-Fold CV R²": "0.9485 ± 0.0020", "Key Hyperparameters": "n_estimators=180, learning_rate=0.15, max_depth=5", "Category": "Ensemble Boosting"},
     {"Rank": 2, "Algorithm": "Random Forest Regressor", "Test R²": 0.9492, "RMSE (veh/hr)": 447.50, "MAE (veh/hr)": 257.26, "5-Fold CV R²": "0.9454 ± 0.0024", "Key Hyperparameters": "n_estimators=150, max_depth=12", "Category": "Ensemble Bagging"},
-    {"Rank": 3, "Algorithm": "Decision Tree Regressor", "Test R²": 0.9372, "RMSE (veh/hr)": 497.33, "MAE (veh/hr)": 291.74, "5-Fold CV R²": "N/A", "Key Hyperparameters": "max_depth=8, min_samples_split=20", "Category": "Tree Partitioning"},
-    {"Rank": 4, "Algorithm": "K-Nearest Neighbors (KNN)", "Test R²": 0.9293, "RMSE (veh/hr)": 527.55, "MAE (veh/hr)": 332.08, "5-Fold CV R²": "N/A", "Key Hyperparameters": "n_neighbors=9, weights='distance'", "Category": "Instance-based"},
-    {"Rank": 5, "Algorithm": "Support Vector Regressor (SVR)", "Test R²": 0.8430, "RMSE (veh/hr)": 786.44, "MAE (veh/hr)": 530.07, "5-Fold CV R²": "N/A", "Key Hyperparameters": "kernel='rbf', C=50.0", "Category": "Kernel Method"},
-    {"Rank": 6, "Algorithm": "Polynomial Regression (deg=2)", "Test R²": 0.8419, "RMSE (veh/hr)": 789.05, "MAE (veh/hr)": 602.42, "5-Fold CV R²": "N/A", "Key Hyperparameters": "degree=2, alpha=100.0 (Ridge)", "Category": "Non-linear Polynomial"},
-    {"Rank": 7, "Algorithm": "Ridge Regression", "Test R²": 0.7176, "RMSE (veh/hr)": 1054.72, "MAE (veh/hr)": 820.09, "5-Fold CV R²": "N/A", "Key Hyperparameters": "alpha=48.33", "Category": "Regularized Linear (L2)"},
-    {"Rank": 8, "Algorithm": "Linear Regression (OLS)", "Test R²": 0.7176, "RMSE (veh/hr)": 1054.69, "MAE (veh/hr)": 820.04, "5-Fold CV R²": "N/A", "Key Hyperparameters": "Ordinary Least Squares", "Category": "Linear Baseline"},
-    {"Rank": 9, "Algorithm": "Lasso Regression", "Test R²": 0.7176, "RMSE (veh/hr)": 1054.70, "MAE (veh/hr)": 820.07, "5-Fold CV R²": "N/A", "Key Hyperparameters": "alpha=0.072", "Category": "Regularized Linear (L1)"},
-    {"Rank": 10, "Algorithm": "ElasticNet Regression", "Test R²": 0.6645, "RMSE (veh/hr)": 1149.51, "MAE (veh/hr)": 895.34, "5-Fold CV R²": "N/A", "Key Hyperparameters": "alpha=1.897, l1_ratio=0.2", "Category": "Hybrid L1/L2"}
+    {"Rank": 3, "Algorithm": "Decision Tree Regressor", "Test R²": 0.9372, "RMSE (veh/hr)": 497.33, "MAE (veh/hr)": 291.74, "5-Fold CV R²": "0.9346 ± 0.0023", "Key Hyperparameters": "max_depth=8, min_samples_split=20", "Category": "Tree Partitioning"},
+    {"Rank": 4, "Algorithm": "K-Nearest Neighbors (KNN)", "Test R²": 0.9293, "RMSE (veh/hr)": 527.55, "MAE (veh/hr)": 332.08, "5-Fold CV R²": "0.9237 ± 0.0018", "Key Hyperparameters": "n_neighbors=9, weights='distance'", "Category": "Instance-based"},
+    {"Rank": 5, "Algorithm": "Support Vector Regressor (SVR)", "Test R²": 0.8430, "RMSE (veh/hr)": 786.44, "MAE (veh/hr)": 530.07, "5-Fold CV R²": "0.8343 ± 0.0065", "Key Hyperparameters": "kernel='rbf', C=50.0", "Category": "Kernel Method"},
+    {"Rank": 6, "Algorithm": "Polynomial Regression (deg=2)", "Test R²": 0.8419, "RMSE (veh/hr)": 789.05, "MAE (veh/hr)": 602.42, "5-Fold CV R²": "0.8388 ± 0.0016", "Key Hyperparameters": "degree=2, alpha=100.0 (Ridge)", "Category": "Non-linear Polynomial"},
+    {"Rank": 7, "Algorithm": "Ridge Regression", "Test R²": 0.7176, "RMSE (veh/hr)": 1054.72, "MAE (veh/hr)": 820.09, "5-Fold CV R²": "0.7139 ± 0.0046", "Key Hyperparameters": "alpha=48.33", "Category": "Regularized Linear (L2)"},
+    {"Rank": 8, "Algorithm": "Linear Regression (OLS)", "Test R²": 0.7176, "RMSE (veh/hr)": 1054.69, "MAE (veh/hr)": 820.04, "5-Fold CV R²": "0.7138 ± 0.0046", "Key Hyperparameters": "Ordinary Least Squares", "Category": "Linear Baseline"},
+    {"Rank": 9, "Algorithm": "Lasso Regression", "Test R²": 0.7176, "RMSE (veh/hr)": 1054.70, "MAE (veh/hr)": 820.07, "5-Fold CV R²": "0.7138 ± 0.0046", "Key Hyperparameters": "alpha=0.072", "Category": "Regularized Linear (L1)"},
+    {"Rank": 10, "Algorithm": "ElasticNet Regression", "Test R²": 0.6645, "RMSE (veh/hr)": 1149.51, "MAE (veh/hr)": 895.34, "5-Fold CV R²": "0.6635 ± 0.0040", "Key Hyperparameters": "alpha=1.897, l1_ratio=0.2", "Category": "Hybrid L1/L2"}
 ])
 
 CLASSIFICATION_BENCHMARK = pd.DataFrame([
@@ -838,7 +838,7 @@ elif selected_page == "🏦 Track 2: Classification (10 Models)":
                 # Generate realistic smooth ROC curve mapping the AUC
                 power = (1 - auc_score) / auc_score * 3.5
                 tpr_curve = 1 - (1 - fpr_space) ** power
-                fig_roc.add_trace(go.Scatter(x=fpr_space, y=tpr_curve, mode='lines', name=f"{row['Model']} (AUC = {auc_score:.4f})", lw=2))
+                fig_roc.add_trace(go.Scatter(x=fpr_space, y=tpr_curve, mode='lines', name=f"{row['Model']} (AUC = {auc_score:.4f})", line=dict(width=2)))
                 
             fig_roc.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name="Chance (AUC = 0.5000)", line=dict(color='#94a3b8', dash='dash')))
             fig_roc.update_layout(
