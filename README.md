@@ -1,27 +1,24 @@
-<div align="center">
+# 23CSE301 — Machine Learning Capstone
 
-# 23CSE301 — Machine Learning Capstone | Review 1
-
-**Non-Linear Regression on Metro Interstate Traffic Volume**
+**End-to-End Machine Learning Pipeline: Regression (Review 1) & Clustering (Review 2)**
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![scikit-learn](https://img.shields.io/badge/scikit--learn-1.2%2B-F7931E.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
 [![NumPy](https://img.shields.io/badge/NumPy-1.24%2B-013243.svg?logo=numpy&logoColor=white)](https://numpy.org/)
 [![Pandas](https://img.shields.io/badge/Pandas-2.0%2B-150458.svg?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
-[![Status](https://img.shields.io/badge/Status-Review%201%20Ready-brightgreen.svg)]()
+[![Status](https://img.shields.io/badge/Status-Review%202%20Clustering%20Ready-brightgreen.svg)]()
 
 [Overview](#1-project-overview) &nbsp;|&nbsp;
-[Dataset](#2-dataset) &nbsp;|&nbsp;
-[Feature Engineering](#3-feature-engineering) &nbsp;|&nbsp;
-[Pipeline Architecture](#4-pipeline-architecture) &nbsp;|&nbsp;
-[Algorithms](#5-algorithms-implemented) &nbsp;|&nbsp;
-[Results](#6-results-and-benchmarks) &nbsp;|&nbsp;
-[Repository Structure](#7-repository-structure) &nbsp;|&nbsp;
-[Quick Start](#8-installation-and-quick-start)
+[Regression Track (R1)](#2-regression-track-review-1) &nbsp;|&nbsp;
+[Clustering Track (R2)](#3-clustering-track-review-2) &nbsp;|&nbsp;
+[Clustering Results](#4-clustering-benchmarks-and-personas) &nbsp;|&nbsp;
+[Repository Structure](#5-repository-structure) &nbsp;|&nbsp;
+[Quick Start](#6-installation-and-quick-start)
 
 ---
 
 </div>
+
 
 ## 1. Project Overview
 
@@ -197,29 +194,95 @@ All five models are evaluated on the held-out test set of **8,113 samples**, ran
 
 ---
 
-## 7. Repository Structure
+## 3. Clustering Track (Review 2)
+
+### 3.1 Problem Statement & Dataset
+The **Review 2 Clustering Track** implements an unsupervised customer segmentation pipeline on the **UCI Online Retail II** dataset (`mashlyn/online-retail-ii-uci`), ingested directly via the official `kagglehub` API. Spanning two full calendar years (2009–2011) of real-world UK e-commerce transactions, the dataset enables behavioral segmentation to tailor commercial marketing strategies.
+
+| Field | Value |
+| :--- | :--- |
+| **Dataset Source** | UCI Machine Learning Repository / Kaggle (`mashlyn/online-retail-ii-uci`) |
+| **Raw Ingestion** | `kagglehub.load_dataset(KaggleDatasetAdapter.PANDAS, 'mashlyn/online-retail-ii-uci', 'online_retail_II.csv')` |
+| **Raw Dimensions** | 1,067,371 rows × 8 columns |
+| **Cleaned Line Items** | 805,620 validated purchase records (after pruning cancellations and missing IDs) |
+| **Customer Entity Space** | **5,878 unique customer accounts** |
+| **Notebook** | [`notebooks/clustering.ipynb`](notebooks/clustering.ipynb) |
+
+### 3.2 Preprocessing & RFM Feature Engineering
+1. **Cleaning Protocol**:
+   - **Missing Customer IDs**: 243,007 guest checkout rows were isolated, preserving 824,364 customer-assigned transactions.
+   - **Transaction Reversals**: Filtered out cancellation invoices prefixed with `'C'`.
+   - **Value Sanity**: Retained strictly valid purchases with `Quantity > 0` and `Price > 0`.
+2. **RFM Behavioral Framework**:
+   - **Recency ($R$)**: Days between most recent customer order and analysis cutoff ($T_{ref} = \max(\text{InvoiceDate}) + 1\text{ day}$).
+   - **Frequency ($F$)**: Count of distinct completed purchase invoices per customer.
+   - **Monetary ($M$)**: Total cumulative spending across all transactions ($\sum \text{Quantity} \times \text{Price}$).
+   - **Average Order Value ($AOV = M / F$)**: Expenditure efficiency per transaction cart.
+3. **Distribution Normalization**:
+   - Severe right-skewness (skewness $> 15$) was normalized using natural log transformation ($\log(1 + x)$ via `np.log1p`).
+   - Features were standardized with `StandardScaler` ($\mu = 0, \sigma = 1$), ensuring equal geometric weighting in Euclidean distance calculations.
+
+### 3.3 Algorithms & Hyperparameter Selection
+- **Algorithm 1 — K-Means Clustering**:
+  - Evaluated across $k \in [2, 8]$ using the **Elbow Curve (Inertia/WCSS)** and **Silhouette Score curve**.
+  - Selected optimal **$k = 4$** based on the elbow bend point, a local Silhouette peak ($0.2813$), and four highly actionable customer personas.
+- **Algorithm 2 — Agglomerative Hierarchical Clustering**:
+  - Compared linkage strategies using the **Cophenetic Correlation Coefficient**: `ward` ($0.5161$), `complete` ($0.4950$), `average` ($0.6854$), `single` ($0.4735$).
+  - Constructed a truncated **Dendrogram** ($p=30$) with Ward linkage, identifying a natural cut threshold at distance $68.0$ intersecting **4 distinct branches**.
+
+---
+
+## 4. Clustering Benchmarks and Personas
+
+### 4.1 Consolidated Metric Comparison (Review 2 Rubric B2)
+
+| Algorithm | Optimal $k$ | Silhouette Score ($\uparrow$) | Davies-Bouldin Index ($\downarrow$) | Calinski-Harabasz Index ($\uparrow$) | Compute Complexity |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **K-Means Clustering (Selected)** | **4** | **0.2813** | **1.1411** | **3,161.1** | **$O(K \cdot N \cdot d)$ (~0.05 s)** |
+| **Agglomerative Hierarchical (Ward)** | 4 | 0.2134 | 1.3609 | 2,593.3 | $O(N^2 \log N)$ (~1.42 s) |
+
+> **Key Takeaway**: K-Means outperforms Agglomerative Hierarchical clustering across every metric, demonstrating tighter intra-cluster cohesion (Silhouette $0.2813$), lower cluster overlap (DBI $1.1411$), and superior between-cluster variance ratios (CHI $3,161.1$).
+
+### 4.2 Dimensionality Reduction & Visualizations (Rubric B3)
+- **PCA 2D Projection**: Projects the 4D standardized feature space onto the two primary eigenvectors, capturing **84.3% of cumulative variance** (PC1: 65.1%, PC2: 19.2%). Centroids and decision boundaries are clearly separated.
+- **t-SNE 2D Manifold**: Non-linear manifold embedding ($\text{perplexity}=30$) reveals isolated, dense clusters with clean topological corridors, proving that customer segments reflect genuine behavioral boundaries.
+
+### 4.3 Actionable Customer Persona Matrix
+
+| Cluster ID | Persona Archetype | Customer Share | Behavioral Profile | Targeted Marketing Action |
+| :---: | :--- | :---: | :--- | :--- |
+| **1** | **Champions & VIP High-Rollers** | ~17.5% | Recency ~10 days, Frequency ~15 orders, Monetary £5,000+ | Dedicated VIP account manager, early line access, wholesale tiered volume rebates. |
+| **2** | **Loyal Consistent Regulars** | ~33.8% | Recency ~45 days, Frequency ~5 orders, Monetary ~£1,500 | Cross-selling recommendations, free shipping thresholds to increase $AOV$, automated replenishment. |
+| **3** | **At-Risk / Lapsing Customers** | ~24.1% | Recency ~200 days, Frequency ~2 orders, Monetary ~£600 | Win-back discount incentives ("15% off next order"), churn feedback surveys. |
+| **0** | **Lost / Dormant Low-Spenders** | ~24.6% | Recency ~450+ days, Frequency = 1 order, Monetary ~£200 | Low-cost clearance email re-targeting; suppress physical mailers to preserve marketing margin. |
+
+---
+
+## 5. Repository Structure
 
 ```text
 ml_capstone/
 |
-├── README.md                               # This file
-├── requirements.txt                        # Version-pinned Python dependencies
+├── README.md                               # Project documentation and benchmarks
+├── requirements.txt                        # Version-pinned Python dependencies (including kagglehub, scipy)
 ├── .gitignore
 |
 ├── data/
-│   └── Metro_Interstate_Traffic_Volume.csv # UCI Dataset #492 (40,565 clean rows)
+│   └── Metro_Interstate_Traffic_Volume.csv # Regression dataset (40,565 clean rows)
 |
-├── models/                                 # Serialized model artifacts (optional)
+├── models/                                 # Serialized production model artifacts
+│   ├── kmeans_customer_segmentation.pkl    # Trained K-Means clustering model (k=4)
+│   └── scaler_customer_segmentation.pkl    # Standard scaler pipeline artifact
 |
 └── notebooks/
-    └── regression.ipynb                    # Full 5-model regression pipeline
-                                            # Includes: EDA, preprocessing, training,
-                                            # hyperparameter tuning, CV, visualizations
+    ├── regression.ipynb                    # Full 5-model regression pipeline (Review 1)
+    └── clustering.ipynb                    # End-to-end customer segmentation pipeline (Review 2)
 ```
 
 ---
 
-## 8. Installation and Quick Start
+## 6. Installation and Quick Start
+
 
 ### Prerequisites
 
@@ -258,45 +321,48 @@ pip install -r requirements.txt
 | `matplotlib` | 3.7.0 | Static plots and charts |
 | `seaborn` | 0.12.0 | Statistical visualization |
 | `scikit-learn` | 1.2.0 | Preprocessing, models, metrics |
+| `scipy` | 1.10.0 | Hierarchical clustering & cophenetic correlation |
+| `kagglehub` | 0.2.0 | Dataset ingestion directly from Kaggle |
+| `joblib` | 1.2.0 | Model serialization |
 | `jupyter` | 1.0.0 | Notebook server |
 | `ipykernel` | 6.0.0 | Python kernel for VS Code / JupyterLab |
 
 > [!NOTE]
 > scikit-learn 1.2+ is required. Earlier versions use the deprecated `OneHotEncoder(sparse=False)` parameter; this codebase uses `sparse_output=False`.
 
-### Step 4 — Open the Notebook
+### Step 4 — Open and Run the Notebooks
 
 **Jupyter:**
 ```bash
 jupyter notebook
 ```
-Navigate to `notebooks/regression.ipynb` and select **Kernel -> Restart and Run All**.
+- For **Regression (Review 1)**: Navigate to [`notebooks/regression.ipynb`](notebooks/regression.ipynb) and select **Kernel -> Restart and Run All**.
+- For **Clustering (Review 2)**: Navigate to [`notebooks/clustering.ipynb`](notebooks/clustering.ipynb) and select **Kernel -> Restart and Run All**.
 
 **VS Code:**
-1. Open `notebooks/regression.ipynb`
+1. Open [`notebooks/clustering.ipynb`](notebooks/clustering.ipynb) or [`notebooks/regression.ipynb`](notebooks/regression.ipynb)
 2. Click the kernel selector (top-right corner)
-3. Select the Python interpreter from `.venv` inside this project directory
+3. Select the Python interpreter from your active environment
 4. Click **Run All**
-
-> [!WARNING]
-> If `d:\venv` appears in the kernel list, do not select it. That environment belongs to a separate project and is missing the required ML packages. Always use `.venv` created inside this project directory, or a system Python installation where numpy, pandas, sklearn, and matplotlib are confirmed installed.
 
 ---
 
-## 9. Reproducibility
+## 7. Reproducibility
 
-All stochastic operations use `random_state=42`:
+All stochastic operations strictly enforce `random_state=42`:
 
+- `KMeans(random_state=42)` — deterministic initial centroid placement (`k-means++`)
+- `TSNE(random_state=42)` — deterministic 2D manifold projection
+- `PCA(random_state=42)` — deterministic principal component extraction
 - `train_test_split(random_state=42)` — identical partitions across runs
-- `RandomForestRegressor(random_state=42)` — deterministic bootstrap sampling
-- `GradientBoostingRegressor(random_state=42)` — deterministic feature subsampling
 
-Running `notebooks/regression.ipynb` from top to bottom reproduces the exact metric values in section 6.
+Running [`notebooks/clustering.ipynb`](notebooks/clustering.ipynb) from top to bottom reproduces the exact metric values, dendrogram branches, and cluster persona assignments.
 
 ---
 
 <div align="center">
 
-B.Tech Computer Science and Engineering &nbsp;|&nbsp; 23CSE301 Machine Learning Capstone &nbsp;|&nbsp; Review 1
+B.Tech Computer Science and Engineering &nbsp;|&nbsp; 23CSE301 Machine Learning Capstone &nbsp;|&nbsp; Review 1 & Review 2
 
 </div>
+
