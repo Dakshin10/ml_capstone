@@ -21,8 +21,7 @@ An end-to-end Machine Learning pipeline encompassing **Regression**, **Classific
 7. [Repository File Tree & Artifact Registry](#7-repository-file-tree--artifact-registry)
 8. [Installation & Reproduction Guide](#8-installation--reproduction-guide)
 9. [Mathematical & Algorithmic Foundations](#9-mathematical--algorithmic-foundations)
-10. [Technical Defense & Viva Voce Preparation](#10-technical-defense--viva-voce-preparation)
-11. [Academic Attribution & License](#11-academic-attribution--license)
+10. [Academic Attribution & License](#10-academic-attribution--license)
 
 ---
 
@@ -32,9 +31,9 @@ This capstone addresses three distinct business and scientific challenges using 
 
 | Track | Dataset & Source | Problem Statement | Target Variable | Type | Evaluated Algorithms | Primary Benchmark Metric | Top Performer |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **🚗 Track 1: Regression** | `Metro_Interstate_Traffic_Volume.csv` (UCI / Minnesota DOT) | Forecast hourly eastbound traffic volume on Interstate 94 in Minneapolis-St. Paul | `traffic_volume` | Continuous ($[0, 7280]$ veh/hr) | **10 Models** (Linear, Ridge, Lasso, ElasticNet, Poly, Decision Tree, Random Forest, GBR, SVR, KNN) | $R^2$, RMSE, MAE, 5-Fold CV $R^2$ | **Gradient Boosting Regressor** ($R^2 = 0.9529$, $\text{CV } R^2 = 0.9485$) |
-| **🏦 Track 2: Classification** | `bank-full.csv` (UCI Bank Marketing) | Predict whether a telemarketing client will subscribe to a long-term term deposit | `y` (`yes` / `no`) | Binary ($0 / 1$, 88.3% vs. 11.7%) | **10 Models** (Part A: Logistic, KNN, Naive Bayes, Decision Tree, SVC; Part B: Random Forest, AdaBoost, GBC, Bagging, MLP) | Weighted F1, ROC-AUC, Accuracy, Precision, Recall | **Gradient Boosting Classifier** ($\text{ROC-AUC} = 0.8056$, $\text{F1} = 0.8770$) |
-| **🛍️ Track 3: Clustering** | `online_retail_II.csv` (UCI / Kaggle) | Discover natural customer personas from 2 years of e-commerce transactions using RFM | Customer Segments | Unsupervised ($k=4$) | **2 Algorithms** (K-Means with Elbow & Silhouette, Agglomerative Hierarchical with Cophenetic Linkage) | Silhouette Score, Davies-Bouldin, Calinski-Harabasz | **K-Means ($k=4$)** ($\text{Silhouette} = 0.3821$, $\text{DBI} = 0.9412$) |
+| **🚗 Track 1: Regression** | `Metro_Interstate_Traffic_Volume.csv` (UCI / Minnesota DOT) | Forecast hourly eastbound traffic volume on Interstate 94 in Minneapolis-St. Paul | `traffic_volume` | Continuous ($[0, 7280]$ veh/hr) | **10 Models** (Linear, Ridge, Lasso, ElasticNet, Poly, Decision Tree, Random Forest, GBR, SVR, KNN) | $R^2$, RMSE, MAE, 5-Fold CV $R^2$ | **Gradient Boosting Regressor** ($R^2 = 0.9529$, CV $R^2 = 0.9485$) |
+| **🏦 Track 2: Classification** | `bank-full.csv` (UCI Bank Marketing) | Predict whether a telemarketing client will subscribe to a long-term term deposit | `y` (`yes` / `no`) | Binary ($0 / 1$, 88.3% vs. 11.7%) | **10 Models** (Part A: Logistic, KNN, Naive Bayes, Decision Tree, SVC; Part B: Random Forest, AdaBoost, GBC, Bagging, MLP) | Weighted F1, ROC-AUC, Accuracy, Precision, Recall | **Gradient Boosting Classifier** (ROC-AUC = 0.8056, Weighted F1 = 0.8770) |
+| **🛍️ Track 3: Clustering** | `online_retail_II.csv` (UCI / Kaggle) | Discover natural customer personas from 2 years of e-commerce transactions using RFM | Customer Segments | Unsupervised ($k=4$) | **2 Algorithms** (K-Means with Elbow & Silhouette, Agglomerative Hierarchical with Cophenetic Linkage) | Silhouette Score, Davies-Bouldin, Calinski-Harabasz | **K-Means ($k=4$)** (Silhouette = 0.3821, DBI = 0.9412) |
 
 ### 🛡️ Production Hygiene & Pipeline Integrity
 - **Zero Data Snooping:** All transformers (`StandardScaler`, `OneHotEncoder`, log-transforms) are fitted exclusively on the 80% training splits inside scikit-learn `Pipeline` and `ColumnTransformer` objects to eliminate data leakage.
@@ -92,35 +91,38 @@ Open `http://localhost:8501` in your browser. Detailed cloud deployment instruct
 *Dataset:* 48,204 hourly records spanning 2012 to 2018 on Interstate 94 in Minneapolis-St. Paul.
 
 ### 3.1. Data Cleaning & Physics-Based Anomaly Removal
-- **Sensor Dropout Filtering:** Removed physical sensor dropouts where ambient temperature was logged at $0.0\text{ K}$ ($-273.15^\circ\text{C}$).
-- **Precipitation Anomaly Filter:** Filtered impossible rainfall spikes ($> 500\text{ mm}$ in a single hour) resulting from sensor recording glitches.
+- **Sensor Dropout Filtering:** Removed physical sensor dropouts where ambient temperature was logged at 0.0 K (-273.15°C).
+- **Precipitation Anomaly Filter:** Filtered impossible rainfall spikes (> 500 mm in a single hour) resulting from sensor recording glitches.
 - **De-duplication:** Eliminated exact duplicate timestamps.
 
 ### 3.2. Circadian Periodic Feature Engineering
-Standard linear representations of hour ($0, 1, \dots, 23$) introduce an artificial discontinuity between 23:00 and 00:00. To preserve circadian continuity, hour was mapped onto the unit circle using periodic trigonometric transformations:
-$$\text{hour}_{\sin} = \sin\left(\frac{2\pi \cdot \text{hour}}{24}\right), \quad \text{hour}_{\cos} = \cos\left(\frac{2\pi \cdot \text{hour}}{24}\right)$$
+Standard linear representations of hour (0, 1, ..., 23) introduce an artificial discontinuity between 23:00 and 00:00. To preserve circadian continuity, hour was mapped onto the unit circle using periodic trigonometric transformations:
+
+$$
+\text{hour}_{\text{sin}} = \sin\left(\frac{2\pi \cdot \text{hour}}{24}\right), \quad \text{hour}_{\text{cos}} = \cos\left(\frac{2\pi \cdot \text{hour}}{24}\right)
+$$
 
 Additional engineered predictors include:
-- $\text{temp\_celsius} = \text{temp} - 273.15$
+- `temp_celsius = temp - 273.15` (Celsius conversion from Kelvin)
 - `is_weekend`: Binary flag identifying Saturday and Sunday traffic dynamics.
 - `is_holiday`: Binary flag identifying US federal holidays.
-- `day_of_week` ($0 \dots 6$) and `month` ($1 \dots 12$).
+- `day_of_week` (0 to 6) and `month` (1 to 12).
 
 ### 3.3. 10-Algorithm Benchmark Leaderboard
 All models were fitted on the 80% training set ($N = 38,563$) and evaluated on the 20% held-out test set ($N = 9,641$). Complete 5-fold cross-validation was computed across all 10 algorithms:
 
 | Rank | Algorithm | Model Family | Test $R^2$ | RMSE (veh/hr) | MAE (veh/hr) | **5-Fold CV $R^2$ (Mean $\pm$ Std)** | Fold 1–5 CV Breakdown | Key Hyperparameters / Notes |
 | :---: | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| 🥇 **1** | **Gradient Boosting Regressor** | Sequential Boosting | **0.9529** | **430.65** | **255.57** | **$0.9485 \pm 0.0020$** | 0.9507, 0.9508, 0.9484, 0.9455, 0.9474 | $n=150$, $\text{lr}=0.1$, $\text{depth}=5$; captures complex diurnal interactions |
-| 🥈 **2** | **Random Forest Regressor** | Bagged Ensemble | **0.9492** | **447.50** | **257.26** | **$0.9454 \pm 0.0024$** | 0.9474, 0.9484, 0.9460, 0.9419, 0.9435 | $n=150$, $\text{depth}=15$, $\text{min\_samples\_split}=5$; robust variance reduction |
-| 🥉 **3** | **Decision Tree Regressor** | Partitioning Tree | **0.9372** | **497.33** | **291.74** | **$0.9346 \pm 0.0023$** | 0.9349, 0.9383, 0.9355, 0.9315, 0.9329 | $\text{max\_depth}=12$; strong non-linear baseline |
-| **4** | **K-Nearest Neighbors (KNN)** | Non-parametric Distance | **0.9293** | **527.55** | **332.08** | **$0.9237 \pm 0.0018$** | 0.9258, 0.9253, 0.9233, 0.9209, 0.9230 | $k=9$, `weights='distance'`, Euclidean metric |
-| **5** | **Support Vector Regressor (SVR)** | Kernel Machine | **0.8430** | **786.44** | **530.07** | **$0.8343 \pm 0.0065$** | 0.8410, 0.8255, 0.8426, 0.8322, 0.8302 | RBF kernel, $C=50.0$, $\epsilon=0.1$; scaled features |
+| 🥇 **1** | **Gradient Boosting Regressor** | Sequential Boosting | **0.9529** | **430.65** | **255.57** | **$0.9485 \pm 0.0020$** | 0.9507, 0.9508, 0.9484, 0.9455, 0.9474 | `n_estimators=150`, `learning_rate=0.1`, `max_depth=5`; captures complex diurnal interactions |
+| 🥈 **2** | **Random Forest Regressor** | Bagged Ensemble | **0.9492** | **447.50** | **257.26** | **$0.9454 \pm 0.0024$** | 0.9474, 0.9484, 0.9460, 0.9419, 0.9435 | `n_estimators=150`, `max_depth=15`, `min_samples_split=5`; robust variance reduction |
+| 🥉 **3** | **Decision Tree Regressor** | Partitioning Tree | **0.9372** | **497.33** | **291.74** | **$0.9346 \pm 0.0023$** | 0.9349, 0.9383, 0.9355, 0.9315, 0.9329 | `max_depth=12`; strong non-linear baseline |
+| **4** | **K-Nearest Neighbors (KNN)** | Non-parametric Distance | **0.9293** | **527.55** | **332.08** | **$0.9237 \pm 0.0018$** | 0.9258, 0.9253, 0.9233, 0.9209, 0.9230 | `k=9`, `weights='distance'`, Euclidean metric |
+| **5** | **Support Vector Regressor (SVR)** | Kernel Machine | **0.8430** | **786.44** | **530.07** | **$0.8343 \pm 0.0065$** | 0.8410, 0.8255, 0.8426, 0.8322, 0.8302 | RBF kernel, `C=50.0`, `epsilon=0.1`; scaled features |
 | **6** | **Polynomial Regression (deg=2)** | Polynomial OLS | **0.8419** | **789.05** | **602.42** | **$0.8388 \pm 0.0016$** | 0.8392, 0.8413, 0.8367, 0.8375, 0.8390 | Degree-2 quadratic interaction terms |
-| **7** | **Ridge Regression** | L2 Regularized Linear | **0.7176** | **1054.72** | **820.09** | **$0.7139 \pm 0.0046$** | 0.7154, 0.7164, 0.7054, 0.7133, 0.7187 | $\alpha=48.33$ tuned via RidgeCV |
+| **7** | **Ridge Regression** | L2 Regularized Linear | **0.7176** | **1054.72** | **820.09** | **$0.7139 \pm 0.0046$** | 0.7154, 0.7164, 0.7054, 0.7133, 0.7187 | `alpha=48.33` tuned via RidgeCV |
 | **8** | **Linear Regression (OLS)** | Baseline Linear | **0.7176** | **1054.69** | **820.04** | **$0.7138 \pm 0.0046$** | 0.7154, 0.7164, 0.7053, 0.7133, 0.7187 | Ordinary Least Squares analytical solution |
-| **9** | **Lasso Regression** | L1 Regularized Linear | **0.7176** | **1054.70** | **820.07** | **$0.7138 \pm 0.0046$** | 0.7154, 0.7164, 0.7053, 0.7133, 0.7187 | $\alpha=0.07$ tuned via LassoCV; sparse feature weights |
-| **10** | **ElasticNet Regression** | L1 + L2 Hybrid Penalty | **0.6645** | **1149.51** | **895.34** | **$0.6635 \pm 0.0040$** | 0.6649, 0.6667, 0.6581, 0.6595, 0.6684 | $\alpha=0.1$, $l_1\text{\_ratio}=0.5$ |
+| **9** | **Lasso Regression** | L1 Regularized Linear | **0.7176** | **1054.70** | **820.07** | **$0.7138 \pm 0.0046$** | 0.7154, 0.7164, 0.7053, 0.7133, 0.7187 | `alpha=0.07` tuned via LassoCV; sparse feature weights |
+| **10** | **ElasticNet Regression** | L1 + L2 Hybrid Penalty | **0.6645** | **1149.51** | **895.34** | **$0.6635 \pm 0.0040$** | 0.6649, 0.6667, 0.6581, 0.6595, 0.6684 | `alpha=0.1`, `l1_ratio=0.5`; balanced penalty |
 
 ### 3.4. Diagnostic Visualizations
 <p align="center">
@@ -143,25 +145,25 @@ All models were fitted on the 80% training set ($N = 38,563$) and evaluated on t
 
 ### 4.2. Severe Class Imbalance Handling
 The dataset contains a severe class disparity:
-- **Class 0 (No Subscription):** 39,922 records ($88.30\%$)
-- **Class 1 (Subscription):** 5,289 records ($11.70\%$)
+- **Class 0 (No Subscription):** 39,922 records (88.30%)
+- **Class 1 (Subscription):** 5,289 records (11.70%)
 
-Accuracy is a deceptive metric in this domain (a naive constant-majority classifier achieves $88.3\%$ accuracy with $0.0$ recall). Models are partitioned using **Stratified 80/20 train/test splitting** and ranked using **Weighted F1** and **Area Under the ROC Curve (ROC-AUC)**.
+Accuracy is a deceptive metric in this domain (a naive constant-majority classifier achieves 88.3% accuracy with 0.0 recall). Models are partitioned using **Stratified 80/20 train/test splitting** and ranked using **Weighted F1** and **Area Under the ROC Curve (ROC-AUC)**.
 
 ### 4.3. 10-Algorithm Benchmark Leaderboard
 Evaluated across Part A (5 Classical Baseline Models) and Part B (5 Advanced Ensemble & Neural Models):
 
 | Rank | Algorithm | Track / Review | Model Family | Accuracy | Precision (Weighted) | Recall (Weighted) | Weighted F1 | ROC-AUC | Key Parameters |
 | :---: | :--- | :---: | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| 🥇 **1** | **Gradient Boosting** | Part B (Rev 2) | Sequential Boosting | **0.8978** | **0.8803** | **0.8978** | **0.8770** | **0.8056** | $n=150$, $\text{lr}=0.1$, $\text{depth}=4$ |
-| 🥈 **2** | **Bagging Classifier** | Part B (Rev 2) | Bagged Trees | **0.8963** | **0.8777** | **0.8963** | **0.8736** | **0.7634** | $n=50$ base decision estimators |
-| 🥉 **3** | **MLP Classifier** | Part B (Rev 2) | Neural Network | **0.8945** | **0.8745** | **0.8945** | **0.8701** | **0.7828** | Hidden layers: $(64, 32)$, ReLU, Adam |
-| **4** | **Support Vector Classifier (SVC)** | Part A (Rev 1) | Kernel Machine | 0.8933 | 0.8726 | 0.8933 | 0.8659 | 0.7184 | RBF kernel, $C=1.0$, `probability=True` |
-| **5** | **Random Forest** | Part B (Rev 2) | Bagged Forest | 0.8943 | 0.8758 | 0.8943 | 0.8654 | 0.8004 | $n=150$, $\text{max\_depth}=12$, balanced |
-| **6** | **Logistic Regression** | Part A (Rev 1) | Generalized Linear | 0.8933 | 0.8730 | 0.8933 | 0.8650 | 0.7717 | $C=1.0$, L2 penalty, liblinear |
-| **7** | **K-Nearest Neighbors (KNN)** | Part A (Rev 1) | Non-parametric | 0.8874 | 0.8612 | 0.8874 | 0.8631 | 0.7027 | $k=5$, Euclidean distance metric |
-| **8** | **Decision Tree** | Part A (Rev 1) | Partitioning Tree | 0.8927 | 0.8740 | 0.8927 | 0.8606 | 0.7055 | $\text{max\_depth}=6$, Gini criterion |
-| **9** | **AdaBoost** | Part B (Rev 2) | Adaptive Boosting | 0.8909 | 0.8739 | 0.8909 | 0.8535 | 0.7651 | $n=100$ decision stumps, $\text{lr}=0.8$ |
+| 🥇 **1** | **Gradient Boosting** | Part B (Rev 2) | Sequential Boosting | **0.8978** | **0.8803** | **0.8978** | **0.8770** | **0.8056** | `n_estimators=150`, `learning_rate=0.1`, `max_depth=4` |
+| 🥈 **2** | **Bagging Classifier** | Part B (Rev 2) | Bagged Trees | **0.8963** | **0.8777** | **0.8963** | **0.8736** | **0.7634** | `n_estimators=50` base decision estimators |
+| 🥉 **3** | **MLP Classifier** | Part B (Rev 2) | Neural Network | **0.8945** | **0.8745** | **0.8945** | **0.8701** | **0.7828** | Hidden layers: `(64, 32)`, ReLU, Adam |
+| **4** | **Support Vector Classifier (SVC)** | Part A (Rev 1) | Kernel Machine | 0.8933 | 0.8726 | 0.8933 | 0.8659 | 0.7184 | RBF kernel, `C=1.0`, `probability=True` |
+| **5** | **Random Forest** | Part B (Rev 2) | Bagged Forest | 0.8943 | 0.8758 | 0.8943 | 0.8654 | 0.8004 | `n_estimators=150`, `max_depth=12`, balanced |
+| **6** | **Logistic Regression** | Part A (Rev 1) | Generalized Linear | 0.8933 | 0.8730 | 0.8933 | 0.8650 | 0.7717 | `C=1.0`, L2 penalty, liblinear solver |
+| **7** | **K-Nearest Neighbors (KNN)** | Part A (Rev 1) | Non-parametric | 0.8874 | 0.8612 | 0.8874 | 0.8631 | 0.7027 | `k=5`, Euclidean distance metric |
+| **8** | **Decision Tree** | Part A (Rev 1) | Partitioning Tree | 0.8927 | 0.8740 | 0.8927 | 0.8606 | 0.7055 | `max_depth=6`, Gini impurity criterion |
+| **9** | **AdaBoost** | Part B (Rev 2) | Adaptive Boosting | 0.8909 | 0.8739 | 0.8909 | 0.8535 | 0.7651 | `n_estimators=100` decision stumps, `lr=0.8` |
 | **10** | **Gaussian Naive Bayes** | Part A (Rev 1) | Probabilistic | 0.8452 | 0.8615 | 0.8452 | 0.8525 | 0.7514 | Gaussian conditional independence |
 
 ### 4.4. Diagnostic Visualizations
@@ -175,7 +177,7 @@ Evaluated across Part A (5 Classical Baseline Models) and Part B (5 Advanced Ens
 </p>
 
 *Business Conversion & Decision Threshold Moving:*  
-Under the standard decision threshold $\tau = 0.50$, many high-potential leads are rejected. By adjusting $\tau$ to $0.25$–$0.30$ in the Streamlit lead scoring engine, telemarketing teams capture over $72\%$ of positive subscribers while tripling conversion efficiency relative to random dialing.
+Under the standard decision threshold $\tau = 0.50$, many high-potential leads are rejected. By adjusting $\tau$ to $0.25$–$0.30$ in the Streamlit lead scoring engine, telemarketing teams capture over 72% of positive subscribers while tripling conversion efficiency relative to random dialing.
 
 ---
 
@@ -197,7 +199,11 @@ For each unique customer account, four core behavioral features were extracted:
 4. **Average Order Value ($AOV$):** Mean revenue per order ($M / F$).
 
 Because retail spend and transaction frequencies follow power-law distributions with severe positive right-skewness, all RFM dimensions were transformed via:
-$$x_{\text{trans}} = \log(1 + x) = \log_{1p}(x)$$
+
+$$
+x_{\text{trans}} = \log(1 + x) = \log_{1p}(x)
+$$
+
 and standardized using `StandardScaler` ($\mu = 0, \sigma = 1$).
 
 ### 5.3. Algorithm 1: K-Means Clustering (Optimal $k=4$)
@@ -207,9 +213,9 @@ Evaluated across cluster counts $k \in [2, 8]$ using:
 
 ### 5.4. Algorithm 2: Agglomerative Hierarchical Clustering
 Evaluated using distance matrices and the **Cophenetic Correlation Coefficient** across three linkage criteria:
-- **Ward Linkage (Minimum Variance):** Cophenetic Correlation $= 0.732$ (Produces spherical, balanced clusters).
-- **Average Linkage:** Cophenetic Correlation $= 0.684$.
-- **Complete Linkage:** Cophenetic Correlation $= 0.612$.
+- **Ward Linkage (Minimum Variance):** Cophenetic Correlation = 0.732 (Produces spherical, balanced clusters).
+- **Average Linkage:** Cophenetic Correlation = 0.684.
+- **Complete Linkage:** Cophenetic Correlation = 0.612.
 
 ### 5.5. Quantitative Model Comparison
 | Validation Metric | K-Means ($k=4$) | Agglomerative Hierarchical ($k=4$, Ward) | Preferred Model & Justification |
@@ -217,7 +223,7 @@ Evaluated using distance matrices and the **Cophenetic Correlation Coefficient**
 | **Silhouette Score** ($\uparrow$) | **0.3821** | 0.3648 | **K-Means** (Superior boundary separation) |
 | **Davies-Bouldin Index** ($\downarrow$) | **0.9412** | 0.9850 | **K-Means** (Tighter cluster cohesion) |
 | **Calinski-Harabasz Index** ($\uparrow$) | **2,684.5** | 2,491.2 | **K-Means** (Higher between-cluster dispersion) |
-| **Inference Latency** | **$< 5\text{ ms}$** | $> 1200\text{ ms}$ ($O(N^2)$ memory) | **K-Means** (Production deployment ready) |
+| **Inference Latency** | **< 5 ms** | > 1200 ms ($O(N^2)$ memory) | **K-Means** (Production deployment ready) |
 
 ### 5.6. Cluster Profiling & Actionable Persona Strategies
 <p align="center">
@@ -394,58 +400,45 @@ Access the application at `http://localhost:8501`.
 ## 9. Mathematical & Algorithmic Foundations
 
 ### 9.1. Coefficient of Determination ($R^2$)
-$$R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2} = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}}$$
+$$
+R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2} = 1 - \frac{\text{SS}_{\text{res}}}{\text{SS}_{\text{tot}}}
+$$
 Measures the proportion of variance in traffic volume explained by the model relative to a naive mean predictor.
 
 ### 9.2. Root Mean Squared Error (RMSE) & Mean Absolute Error (MAE)
-$$\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}, \quad \text{MAE} = \frac{1}{n}\sum_{i=1}^{n} |y_i - \hat{y}_i|$$
+$$
+\text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}, \quad \text{MAE} = \frac{1}{n}\sum_{i=1}^{n} |y_i - \hat{y}_i|
+$$
 RMSE penalizes large error deviations quadratically, making it sensitive to traffic surge outliers.
 
 ### 9.3. Weighted F1 Score
-$$\text{F1}_c = 2 \cdot \frac{\text{Precision}_c \cdot \text{Recall}_c}{\text{Precision}_c + \text{Recall}_c}, \quad \text{Weighted F1} = \sum_{c=0}^{1} \left(\frac{N_c}{N}\right) \text{F1}_c$$
+$$
+\text{F1}_c = 2 \cdot \frac{\text{Precision}_c \cdot \text{Recall}_c}{\text{Precision}_c + \text{Recall}_c}, \quad \text{Weighted F1} = \sum_{c} \left(\frac{N_c}{N}\right) \text{F1}_c
+$$
 Balances precision and recall across both classes weighted by class support, preventing majority-class distortion.
 
 ### 9.4. Silhouette Coefficient
 For sample $i$ belonging to cluster $C_I$:
-$$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}, \quad s(i) \in [-1, 1]$$
+$$
+s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}, \quad s(i) \in [-1, 1]
+$$
 where $a(i)$ is the mean intra-cluster distance from $i$ to all other points in $C_I$, and $b(i)$ is the minimum mean distance from $i$ to points in any other cluster $C_J \ne C_I$.
 
 ### 9.5. Davies-Bouldin Index (DBI)
-$$R_{ij} = \frac{s_i + s_j}{d(c_i, c_j)}, \quad \text{DBI} = \frac{1}{k}\sum_{i=1}^{k} \max_{j \ne i} R_{ij}$$
+$$
+R_{ij} = \frac{s_i + s_j}{d(c_i, c_j)}, \quad \text{DBI} = \frac{1}{k}\sum_{i=1}^{k} \max_{j \ne i} R_{ij}
+$$
 where $s_i$ is cluster dispersion and $d(c_i, c_j)$ is centroid distance. Lower DBI values indicate tighter clusters with greater inter-cluster separation.
 
 ### 9.6. Calinski-Harabasz Index (Variance Ratio Criterion)
-$$\text{CHI} = \frac{\text{Tr}(B_k)}{\text{Tr}(W_k)} \cdot \frac{N - k}{k - 1}$$
+$$
+\text{CHI} = \frac{\text{Tr}(B_k)}{\text{Tr}(W_k)} \cdot \frac{N - k}{k - 1}
+$$
 where $B_k$ is the between-group dispersion matrix and $W_k$ is the within-cluster dispersion matrix. Higher CHI values indicate superior clustering density and separation.
 
 ---
 
-## 10. Technical Defense & Viva Voce Preparation
-
-#### Q1: Why did Gradient Boosting achieve an $R^2$ of 0.9529 while Linear Regression capped at 0.7176?
-> **Answer:** Traffic volume exhibits strong non-linear and conditional interactions. For example, the effect of `hour = 17` (rush hour) produces massive congestion on a Tuesday, but light traffic on a Sunday or holiday. Linear and regularized models are restricted to additive hyperplanes. In contrast, Gradient Boosting constructs an ensemble of shallow regression trees that split feature space into piecewise constant regions, capturing non-linear diurnal cycles and weather interactions without requiring manual polynomial feature explosions.
-
-#### Q2: Why is the `duration` feature strictly removed in the Bank Marketing track?
-> **Answer:** `duration` represents the length of the telemarketing call. In real-world deployment, the duration is unknown before making the call. Furthermore, long call durations correlate almost perfectly with successful subscription simply because interested clients stay on the line longer. Training with `duration` introduces severe target leakage: the model learns an artificial shortcut that fails in production prospective lead scoring.
-
-#### Q3: What is the benefit of computing 5-fold cross-validation on all 10 regression models?
-> **Answer:** A single train/test split can be biased by an unusually favorable or adverse test partition. By conducting 5-fold cross-validation across the entire feature matrix, we evaluate each model on five independent held-out folds. For Gradient Boosting, the mean CV $R^2$ is $0.9485 \pm 0.0020$. The small standard deviation ($\sigma = 0.0020$) proves the model's generalization capability across seasonal and temporal variations.
-
-#### Q4: Why must RFM features be log-transformed before K-Means clustering?
-> **Answer:** Retail transactional data exhibits extreme right-skewness: a few high-value enterprise accounts purchase thousands of items and spend tens of thousands of pounds, while the vast majority place 1–2 modest orders. K-Means optimizes Within-Cluster Sum of Squares (Euclidean distance). Extreme outliers distort the calculated cluster centroids, pulling clusters toward extreme values. Applying $\log(1 + x)$ compresses heavy tails and stabilizes variance, allowing Euclidean distance to reflect relative percentage differences.
-
-#### Q5: Why did Ward's linkage outperform Complete and Average linkage in Hierarchical clustering?
-> **Answer:** Ward's criterion minimizes total within-cluster variance (similar to K-Means' objective function). In multi-dimensional standardized RFM space, Ward's method generates balanced, spherical clusters with consistent sample sizes. In contrast, Complete and Average linkages suffered from chaining phenomena and unequal cluster fragmentation. Ward achieved the highest Cophenetic Correlation ($0.732$).
-
-#### Q6: How does circadian sine/cosine encoding improve model training over raw 0–23 hour integers?
-> **Answer:** An ordinal integer representation implies that 23:00 (11 PM) and 00:00 (Midnight) are separated by a large distance of $|23 - 0| = 23$ units, whereas physically they are adjacent (1 hour apart). Mapping hours onto the 2D Cartesian plane via $\sin(2\pi \cdot \text{hour}/24)$ and $\cos(2\pi \cdot \text{hour}/24)$ ensures that Euclidean distance smoothly wraps around midnight, enabling distance-based models (KNN, SVR) and linear estimators to model cyclical patterns properly.
-
-#### Q7: In the imbalanced classification track, why is threshold moving used in the live simulator?
-> **Answer:** By default, binary classifiers predict the positive class when predicted probability $p \ge 0.50$. In telemarketing lead prioritization, the cost of calling a false positive (a wasted 2-minute call) is much lower than the opportunity loss of missing a true subscriber ($11.7\%$ base rate). By lowering the decision threshold to $\tau \approx 0.25$, we trade modest precision to increase positive recall from $42\%$ to over $72\%$, maximizing net business revenue.
-
----
-
-## 11. Academic Attribution & License
+## 10. Academic Attribution & License
 
 - **Course:** 23CSE301 — Machine Learning
 - **Institution:** Department of Computer Science & Engineering
